@@ -1,0 +1,1309 @@
+<!doctype html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>G-FRAME GamePark</title>
+	<link rel="manifest" href="manifest.json">
+<script>
+if ('serviceWorker' in navigator) {
+	window.addEventListener('load', () => {
+	navigator.serviceWorker.register('sw.js').then(registration => {
+	console.log('ServiceWorker registration successful with scope: ', registration.scope);
+	}, err => {
+	console.log('ServiceWorker registration failed: ', err);
+	}).catch(err => {
+	console.log(err)
+	});
+	});
+}
+</script>
+
+
+<meta name="theme-color" content="#050912">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
+<style>
+:root{--bg:#050912;--panel:#0f1829;--line:rgba(120,160,255,.18);--acc:#0a9dff;--txt:#e8eefc;--dim:#8a97b5;--ok:#35d07f;--danger:#ff5468}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+[hidden]{display:none!important}
+html,body{margin:0;height:100%;background:var(--bg);color:var(--txt);font-family:"Segoe UI","Hiragino Sans","Noto Sans JP",system-ui,sans-serif;overflow:hidden;touch-action:manipulation}
+button{font:inherit;color:inherit;cursor:pointer;border:0;background:none;padding:0}
+input,select{font:inherit;color:inherit}
+input:not([type=checkbox]):not([type=range]):not([type=file]),select{background:#0a1426;border:1px solid var(--line);border-radius:8px;padding:10px 12px;width:100%;outline:none;min-width:0}
+input:focus,select:focus{border-color:var(--acc)}
+input[type=range]{width:100%;accent-color:var(--acc)}
+a{color:#6cc4ff}
+code,.mono{font-family:ui-monospace,Menlo,Consolas,monospace}
+svg.i{width:1.25em;height:1.25em;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex:none}
+h2,h3{margin:0 0 10px}
+h3{font-size:15px;color:#bcd2ff}
+.muted{color:var(--dim)}.small{font-size:12px}.pad{padding:14px}.dim{opacity:.6}
+.lb{display:block;font-size:12px;color:var(--dim);margin:12px 0 6px}
+.primary{background:linear-gradient(100deg,#0a4bb0,#0a9dff);color:#fff;border-radius:8px;padding:10px 16px;font-weight:600;box-shadow:0 4px 18px rgba(10,157,255,.25)}
+.ghost{border:1px solid var(--line);background:rgba(255,255,255,.05);border-radius:8px;padding:9px 14px}
+.danger{background:#4a1520;border:1px solid #9b3345;color:#ffb3bd;border-radius:8px;padding:10px 14px}
+.sm{padding:6px 12px;font-size:13px}
+.ib{width:38px;height:38px;border-radius:10px;display:inline-grid;place-items:center;background:rgba(255,255,255,.06);position:relative;flex:none}
+.ib:disabled{opacity:.3;cursor:default}
+.bdg{position:absolute;top:-4px;right:-4px;background:#ff4d63;color:#fff;font-size:10px;font-style:normal;min-width:16px;height:16px;border-radius:8px;display:grid;place-items:center;padding:0 4px;line-height:1}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{border:1px solid var(--line);border-radius:999px;padding:5px 12px;font-size:13px;background:rgba(255,255,255,.05)}
+.chip.on{background:rgba(10,157,255,.22);border-color:var(--acc);color:#8fd3ff}
+.row2{display:flex;gap:8px;align-items:center}
+.card{background:rgba(15,24,41,.78);border:1px solid var(--line);border-radius:14px;padding:14px;margin-bottom:14px}
+.cols2{display:grid;grid-template-columns:1fr 1fr;gap:14px;align-items:start}
+@media(max-width:820px){.cols2{grid-template-columns:1fr}}
+
+/* switch (Xiaomi style) */
+.sw{position:relative;display:inline-block;flex:none}
+.sw input{position:absolute;opacity:0;inset:0;width:100%;height:100%;margin:0;cursor:pointer;z-index:1}
+.sw i{display:block;width:54px;height:28px;border:2px solid #2b5f9c;border-radius:6px;background:#0a1c36;position:relative;transition:.2s}
+.sw i::after{content:"";position:absolute;top:3px;left:3px;width:20px;height:18px;border-radius:3px;background:#1d5a99;transition:.2s}
+.sw input:checked+i{border-color:#1b8cff;background:#0b2d5c}
+.sw input:checked+i::after{left:27px;background:var(--acc);box-shadow:0 0 10px #0a9dff99}
+
+/* home shell */
+#home{position:fixed;inset:0;display:flex;flex-direction:column;background:radial-gradient(120% 90% at 50% 40%,#10203d 0%,#08101f 55%,#050912 100%);overflow:hidden}
+body.ingame #home{display:none}
+.bgfx{position:absolute;inset:0;pointer-events:none;background-image:radial-gradient(1.5px 1.5px at 12% 22%,#9cc8ff99,transparent),radial-gradient(1px 1px at 78% 18%,#9cc8ff88,transparent),radial-gradient(1.5px 1.5px at 88% 64%,#9cc8ff77,transparent),radial-gradient(1px 1px at 30% 80%,#9cc8ff88,transparent),radial-gradient(1.5px 1.5px at 60% 90%,#9cc8ff66,transparent),radial-gradient(1px 1px at 45% 12%,#9cc8ff77,transparent)}
+.dia{position:absolute;left:50%;top:48%;border:1px solid rgba(120,160,255,.10);transform:translate(-50%,-50%) rotate(45deg)}
+.d1{width:62vmin;height:62vmin}.d2{width:44vmin;height:44vmin;border-color:rgba(120,160,255,.16)}
+.top{position:relative;z-index:3;display:flex;align-items:center;gap:10px;padding:max(10px,env(safe-area-inset-top)) 14px 8px}
+.chips-s{display:flex;gap:12px;font-size:13px;color:#cfe0ff;white-space:nowrap;align-items:center}
+.chips-s .dot{display:inline-block;width:8px;height:8px;border-radius:50%;background:#777;margin-right:5px}
+.chips-s .dot.on{background:var(--ok);box-shadow:0 0 8px var(--ok)}
+.chips-s .dot.wait{background:#ffb020}
+#nav{flex:1;display:flex;gap:4px;overflow-x:auto;justify-content:center;scrollbar-width:none;min-width:0}
+#nav::-webkit-scrollbar{display:none}
+#nav button{display:flex;align-items:center;gap:6px;padding:8px 14px;border-radius:999px;color:var(--dim);white-space:nowrap;position:relative;font-size:14px}
+#nav button.on{background:rgba(10,157,255,.18);color:#6cc4ff}
+#nav .bdg{top:0;right:2px}
+.topbtns{display:flex;gap:8px}
+#btnFs.on{color:#6cc4ff}
+#pages{position:relative;z-index:2;flex:1;min-height:0}
+.page{display:none;position:absolute;inset:0;overflow:auto;padding:8px 18px max(18px,env(safe-area-inset-bottom))}
+.page.on{display:block}
+
+/* hub */
+.hub{height:100%;display:grid;grid-template-columns:minmax(170px,27%) 1fr minmax(170px,27%);gap:18px;align-items:center}
+.glist{display:flex;flex-direction:column;gap:6px;max-height:100%;overflow:auto;padding:30px 0;scrollbar-width:none;-webkit-mask-image:linear-gradient(transparent,#000 14%,#000 86%,transparent);mask-image:linear-gradient(transparent,#000 14%,#000 86%,transparent)}
+.gitem{display:flex;align-items:center;gap:12px;padding:10px 14px;border-radius:12px;opacity:.5;cursor:pointer;transition:.2s;white-space:nowrap}
+.gitem span{overflow:hidden;text-overflow:ellipsis}
+.gitem.sel{opacity:1;font-size:21px;font-weight:700;background:linear-gradient(90deg,rgba(255,255,255,.12),rgba(255,255,255,.02));border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+.aic{object-fit:contain;background:rgba(255,255,255,.08);padding:5px}
+.aic-f{display:grid;place-items:center;background:linear-gradient(135deg,#1b6dff,#0aa0ff);font-weight:700;color:#fff}
+.gi{width:44px;height:44px;border-radius:12px;flex:none}
+.ric{width:46px;height:46px;border-radius:12px;flex:none}
+.stage{display:flex;flex-direction:column;align-items:center;min-width:0}
+.monitor{position:relative;width:100%;max-width:540px;aspect-ratio:16/10;max-height:58vh;border:2px solid rgba(160,190,255,.28);background:#0b1426;border-radius:6px;overflow:hidden;box-shadow:0 24px 60px #000b}
+.mon-bg{position:absolute;inset:-10%;display:grid;grid-template-columns:repeat(4,1fr);gap:14px;padding:14px;filter:blur(9px) brightness(.55) saturate(1.3);transform:rotate(-6deg)}
+.mon-bg img,.mon-bg div{width:100%;aspect-ratio:1;border-radius:22%}
+.mon-icon{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:26%;aspect-ratio:1;max-width:120px}
+.mon-icon img,.mon-icon div{width:100%;height:100%;border-radius:24%;box-shadow:0 0 40px rgba(10,157,255,.45);background:#fff2;font-size:36px}
+.stand{margin-top:-2px;width:70%;max-width:340px;text-align:center;padding:12px 0 8px;clip-path:polygon(8% 0,92% 0,100% 100%,0 100%);background:linear-gradient(#1b2438,#0b1222);color:var(--dim);font-size:15px}
+.stand i{display:block;width:26px;height:3px;background:#3aa8ff;margin:0 auto 6px;border-radius:2px}
+.go{display:flex;flex-direction:column;align-items:center;gap:12px}
+.play-btn{padding:16px 32px;font-size:22px;font-weight:700;border-radius:6px;color:#fff;background:linear-gradient(100deg,#07245a,#0a8cff);box-shadow:0 0 26px rgba(10,140,255,.45),inset 0 0 0 1px rgba(255,255,255,.12);letter-spacing:.04em;max-width:100%}
+.play-btn:active{transform:scale(.97)}
+.empty{height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;text-align:center}
+.eico{font-size:44px;color:#4aa8ff}
+@media(max-width:700px){
+ .hub{grid-template-columns:1fr;grid-template-rows:auto minmax(0,1fr) auto;gap:8px}
+ .glist{flex-direction:row;padding:4px 0;-webkit-mask-image:none;mask-image:none}
+ .gitem.sel{font-size:16px}
+ .gitem{padding:8px 12px}
+ .monitor{max-height:36vh;align-self:center}
+ .play-btn{padding:14px 28px;font-size:19px}
+ .go{flex-direction:row;justify-content:center}
+ .chips-s{font-size:11px;gap:8px}
+ #chipFr{display:none}
+}
+@media(max-height:480px) and (min-width:701px){.monitor{max-height:48vh}.play-btn{padding:12px 22px;font-size:18px}.gitem.sel{font-size:17px}}
+
+/* apps page */
+.ahead{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:10px}
+.ahead h2{margin:0;font-size:20px;flex:none}
+.sbox{flex:1;min-width:160px;max-width:380px}
+.acols{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+@media(max-width:820px){.acols{grid-template-columns:1fr}}
+.col-h{font-size:13px;color:var(--dim);padding:8px 0;border-bottom:1px solid var(--line);margin-bottom:6px}
+.row{display:flex;align-items:center;gap:12px;padding:10px 4px;border-radius:10px;cursor:pointer}
+.row:active{background:rgba(255,255,255,.04)}
+.rmeta{flex:1;min-width:0}
+.rmeta b{display:block;font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.rmeta small{color:var(--dim);font-size:12px;display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.recbox{margin-top:16px}
+
+/* friends / chat */
+.frow{display:flex;align-items:center;gap:12px;padding:10px 6px;border-radius:10px;position:relative}
+.frow[data-id]{cursor:pointer}
+.frow.cur{background:rgba(10,157,255,.12)}
+.fm{flex:1;min-width:0}
+.fm b{display:block;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.fm small{display:block;font-size:12px;color:var(--dim);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.fbtns{display:flex;gap:6px}
+.av{position:relative;width:42px;height:42px;border-radius:50%;flex:none;background:linear-gradient(135deg,#1b6dff,#0aa0ff);display:grid;place-items:center;font-weight:700}
+.av img{width:100%;height:100%;border-radius:50%;object-fit:cover}
+.av .dot{position:absolute;right:-1px;bottom:-1px;width:12px;height:12px;border-radius:50%;background:#59627a;border:2px solid #0f1829}
+.av .dot.on{background:var(--ok)}
+.chat{display:flex;gap:12px;height:100%;min-height:0}
+.chat-list{flex:1;overflow:auto;min-width:0}
+.chat-conv{flex:1;display:none;flex-direction:column;min-height:0;min-width:0}
+.chat.has-target .chat-list{display:none}
+.chat.has-target .chat-conv{display:flex}
+.chat-empty{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;color:var(--dim)}
+.chat-main{flex:1;display:flex;flex-direction:column;min-height:0}
+.chat-top{display:flex;align-items:center;gap:8px;padding-bottom:8px;border-bottom:1px solid var(--line)}
+.ct-name{flex:1;min-width:0}
+.ct-name b{display:block}.ct-name small{color:var(--dim);font-size:12px}
+.msgs{flex:1;overflow:auto;padding:8px 2px;display:flex;flex-direction:column}
+.msg{max-width:80%;padding:8px 12px;border-radius:14px;margin:3px 0;word-break:break-word;white-space:pre-wrap;font-size:14px}
+.msg small{display:block;font-size:10px;opacity:.65;margin-top:3px}
+.msg.me{margin-left:auto;background:#0a62c9;border-bottom-right-radius:4px}
+.msg.them{background:#1a2740;border-bottom-left-radius:4px}
+.chat-form{display:flex;gap:8px;padding-top:8px}
+.chat-form button{padding:0 14px;display:grid;place-items:center}
+#chatHome{height:calc(100vh - 120px);height:calc(100dvh - 120px);min-height:300px}
+@media(min-width:760px){
+ .chat.wide .chat-list{display:block;flex:0 0 290px}
+ .chat.wide .chat-conv{display:flex}
+ .chat.wide .back{display:none}
+}
+
+/* account */
+.acc-top{display:flex;gap:14px;align-items:flex-end}
+.avbig{width:84px;height:84px;border-radius:50%;flex:none;background:linear-gradient(135deg,#1b6dff,#0aa0ff);display:grid;place-items:center;font-size:32px;font-weight:700;overflow:hidden;border:2px solid var(--line)}
+.avbig img{width:100%;height:100%;object-fit:cover}
+.idbox{display:flex;gap:8px;align-items:center;background:#0a1426;border:1px solid var(--line);border-radius:8px;padding:8px 10px}
+.idbox code{flex:1;font-size:12px;word-break:break-all;color:#8fd3ff}
+.setrow{display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid var(--line)}
+.setrow:last-child{border:0}
+.setrow>div{flex:1}.setrow small{display:block;color:var(--dim);font-size:12px;margin-top:2px}
+.chip .x{margin-left:6px;opacity:.6}
+
+/* modal / toast */
+#modal{position:fixed;inset:0;z-index:400;background:rgba(0,0,0,.6);display:flex;align-items:center;justify-content:center;padding:16px;backdrop-filter:blur(4px)}
+.mbox{width:min(460px,100%);max-height:90vh;overflow:auto;background:#0e1830;border:1px solid var(--line);border-radius:16px;padding:18px;box-shadow:0 20px 60px #000}
+.mbox h3{font-size:17px;color:#fff}
+.mbtns{display:flex;gap:8px;justify-content:flex-end;margin-top:16px;flex-wrap:wrap}
+.pv{display:flex;align-items:center;gap:12px;margin-top:10px}
+.pv .aic,.pv .aic-f{width:48px;height:48px;border-radius:12px}
+#toasts{position:fixed;top:max(12px,env(safe-area-inset-top));left:50%;transform:translateX(-50%);z-index:500;display:flex;flex-direction:column;gap:8px;align-items:center;pointer-events:none;width:min(92vw,420px)}
+.toast{background:rgba(14,24,48,.96);border:1px solid var(--line);padding:10px 16px;border-radius:12px;font-size:14px;box-shadow:0 8px 24px #0009;animation:tin .25s;transition:.35s}
+.toast.out{opacity:0;transform:translateY(-8px)}
+@keyframes tin{from{opacity:0;transform:translateY(-10px)}}
+
+/* game layer */
+#game{position:fixed;inset:0;background:#000;z-index:100}
+#gameFrame{position:absolute;inset:0;width:100%;height:100%;border:0;background:#000}
+#dim{position:absolute;inset:0;background:#000;opacity:0;pointer-events:none;z-index:5}
+#fpsHud{position:absolute;top:max(6px,env(safe-area-inset-top));left:8px;z-index:12;font:12px ui-monospace,monospace;color:#7fe0ff;background:rgba(0,0,0,.55);padding:3px 8px;border-radius:6px;pointer-events:none}
+#timerHud{position:absolute;top:max(6px,env(safe-area-inset-top));left:50%;transform:translateX(-50%);z-index:12;font:600 15px ui-monospace,monospace;color:#fff;background:rgba(10,40,90,.75);border:1px solid rgba(110,170,255,.5);padding:4px 12px;border-radius:999px;pointer-events:none}
+#timerHud.done{background:#b3182f;pointer-events:auto;animation:blink 1s infinite}
+@keyframes blink{50%{opacity:.5}}
+#sbHandle{position:absolute;top:50%;transform:translateY(-50%);z-index:20;width:26px;height:88px;background:rgba(15,25,45,.7);backdrop-filter:blur(6px);border:1px solid rgba(110,170,255,.35);display:grid;place-items:center;opacity:.5;color:#bcd7ff}
+#sbHandle:hover,#sbHandle:active{opacity:1}
+#game.right #sbHandle{right:0;border-radius:14px 0 0 14px}
+#game.left #sbHandle{left:0;border-radius:0 14px 14px 0}
+#game.nosb #sbHandle{display:none}
+#game.right #sbHandle svg{transform:rotate(180deg)}
+#sbHandle .bdg{top:2px;right:auto;left:2px}
+#sb{position:absolute;top:0;bottom:0;width:min(410px,90vw);z-index:30;background:linear-gradient(180deg,#0e1a31,#080f1e);display:flex;flex-direction:column;transition:transform .28s cubic-bezier(.2,.8,.2,1);padding-top:env(safe-area-inset-top);padding-bottom:env(safe-area-inset-bottom)}
+#game.right #sb{right:0;transform:translateX(105%);border-left:1px solid var(--line)}
+#game.left #sb{left:0;transform:translateX(-105%);border-right:1px solid var(--line)}
+#game.sbopen #sb{transform:none;box-shadow:0 0 60px #000c}
+#sbScrim{position:absolute;inset:0;z-index:25;background:rgba(0,0,0,.4);display:none}
+#game.sbopen #sbScrim{display:block}
+.sbhead{display:flex;align-items:center;gap:10px;padding:12px 14px 8px}
+.logo{font-weight:800;letter-spacing:.08em;color:#4cb4ff;font-size:17px}
+#sbGame{flex:1;color:var(--dim);font-size:12px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;text-align:right}
+.sbtabs{display:grid;grid-template-columns:repeat(5,1fr);border-bottom:1px solid var(--line)}
+.sbtabs button{display:flex;flex-direction:column;align-items:center;gap:3px;padding:9px 0 7px;font-size:10.5px;color:var(--dim);position:relative;border-bottom:2px solid transparent}
+.sbtabs button.on{color:#6cc4ff;border-color:var(--acc);background:rgba(10,157,255,.07)}
+.sbtabs .bdg{top:2px;right:18%}
+.sbpane{display:none;flex:1;min-height:0;overflow:auto;padding:12px;flex-direction:column;gap:10px}
+.sbpane.on{display:flex}
+.sbpane>*{flex:none}
+.sbpane>.chat{flex:1;min-height:0}
+.tiles{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.tile{display:flex;flex-direction:column;align-items:center;gap:6px;padding:12px 4px;border:1px solid var(--line);border-radius:12px;background:rgba(255,255,255,.04);font-size:11px;text-align:center;color:#c8d6f5}
+.tile svg{font-size:20px}
+.tile.on{color:#6cc4ff;border-color:var(--acc);background:rgba(10,157,255,.14)}
+.mini{padding:12px;margin:0}
+.seg{display:flex;gap:4px;background:#0a1426;border-radius:8px;padding:3px;margin:8px 0}
+.seg button{flex:1;padding:7px 4px;border-radius:6px;font-size:12px;color:var(--dim)}
+.seg button.on{background:#12407c;color:#fff}
+.tm{font:700 38px ui-monospace,Menlo,monospace;text-align:center;margin:6px 0;color:#9fdcff;letter-spacing:.04em}
+.tmset{display:flex;gap:6px;align-items:center;margin-bottom:8px}
+.tmset button{padding:6px 10px;border:1px solid var(--line);border-radius:8px;font-size:12px}
+.tmset input{width:70px;padding:7px}
+.gsearch{display:flex;align-items:center;gap:8px;padding:0 12px;border:1px solid #1f63b5;border-radius:10px;background:linear-gradient(90deg,#0a1a36,#0d2547);box-shadow:0 0 18px rgba(10,120,255,.2) inset,0 0 14px rgba(10,120,255,.15);color:#6cc4ff}
+.gsearch input{border:0!important;background:transparent!important;padding:12px 0!important;flex:1}
+.gsearch button{color:var(--dim);font-size:18px;padding:4px}
+.qb{display:flex;align-items:center;gap:10px;width:100%;padding:11px 12px;border:1px solid var(--line);border-radius:10px;background:rgba(255,255,255,.04);text-align:left;margin-bottom:6px}
+.qb .eng{width:26px;height:26px;border-radius:6px;display:grid;place-items:center;font-weight:800;color:#fff;background:#4285f4;flex:none}
+.qb .eng.b{background:#008373}
+.qb span.t{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.qres-h{display:flex;align-items:center;gap:8px;margin-bottom:6px}
+.qres-h b{flex:1;font-size:13px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+#qRes{display:flex;flex-direction:column;flex:1;min-height:320px}
+#qFrame{flex:1;width:100%;min-height:280px;border:0;border-radius:10px;background:#fff}
+.callp{background:#060c18;border:1px solid var(--line);border-radius:14px;overflow:hidden;margin-bottom:14px}
+.vwrap{position:relative;aspect-ratio:4/3;background:#000}
+.vwrap video{width:100%;height:100%;object-fit:cover;background:#000}
+.vwrap #vLocal,.vwrap .vl{position:absolute;right:8px;bottom:8px;width:28%;height:auto;aspect-ratio:3/4;border-radius:8px;border:1px solid #fff3;object-fit:cover}
+.cstat{position:absolute;left:8px;top:8px;background:#000a;padding:3px 10px;border-radius:999px;font-size:12px}
+.cbtns{display:flex;gap:8px;padding:10px;justify-content:center}
+.ib2{display:flex;flex-direction:column;align-items:center;gap:3px;padding:8px 16px;border-radius:12px;background:rgba(255,255,255,.07);font-size:11px;min-width:70px}
+.ib2.off{background:#4a1520;color:#ffb3bd}
+.ib2.red{background:#b3182f}
+#lockov{position:absolute;inset:0;z-index:60;background:transparent;touch-action:none}
+#unlock{position:absolute;right:14px;bottom:max(14px,env(safe-area-inset-bottom));width:64px;height:64px;border-radius:50%;background:rgba(10,20,40,.6);border:1px solid rgba(110,170,255,.4);display:grid;place-items:center;color:#cfe6ff;font-size:11px;text-align:center;user-select:none;-webkit-user-select:none;opacity:.55}
+#unlock.hold{background:rgba(10,157,255,.55);opacity:1}
+
+/* launch animation */
+#launch{position:fixed;inset:0;z-index:300;background:#030710;overflow:hidden;display:grid;place-items:center}
+#launch.burst{animation:bgOut .8s forwards}
+@keyframes bgOut{to{background:transparent;opacity:0}}
+.ln-grid{position:absolute;inset:-50%;background-image:linear-gradient(rgba(10,157,255,.14) 1px,transparent 1px),linear-gradient(90deg,rgba(10,157,255,.14) 1px,transparent 1px);background-size:46px 46px;transform:perspective(500px) rotateX(62deg) translateY(0);animation:grid 1.4s linear infinite}
+@keyframes grid{to{background-position:0 46px}}
+.ln-scan{position:absolute;left:0;right:0;height:3px;background:linear-gradient(90deg,transparent,#7fe0ff,transparent);box-shadow:0 0 20px #3ab6ff;animation:scan 1.5s ease-in-out infinite}
+@keyframes scan{0%{top:-3px}100%{top:100%}}
+.ln-c{position:relative;text-align:center;padding:0 20px}
+.ln-logo{font-size:clamp(34px,9vw,84px);font-weight:900;letter-spacing:.12em;color:#fff;text-shadow:0 0 24px #1aa0ff,0 0 60px #0a64ff}
+.ln-logo span{display:inline-block;opacity:0;transform:translateY(34px) scale(1.7);filter:blur(10px);animation:lnIn .6s calc(var(--i)*70ms + .1s) forwards cubic-bezier(.2,.9,.2,1)}
+@keyframes lnIn{to{opacity:1;transform:none;filter:none}}
+.ln-sub{margin-top:10px;font-size:14px;color:#8fd3ff;letter-spacing:.3em;opacity:0;animation:fadeIn .5s 1s forwards;text-transform:uppercase}
+@keyframes fadeIn{to{opacity:1}}
+.ln-bar{margin:22px auto 0;width:min(320px,70vw);height:4px;background:#12284a;border-radius:2px;overflow:hidden}
+.ln-bar i{display:block;height:100%;width:0;background:linear-gradient(90deg,#0a9dff,#9fe8ff);animation:lnBar 1.4s .3s forwards ease-in-out;box-shadow:0 0 12px #3ab6ff}
+@keyframes lnBar{to{width:100%}}
+#launch.burst .ln-c{animation:lnOut .75s forwards ease-in}
+@keyframes lnOut{to{transform:scale(2.2);opacity:0;filter:blur(8px)}}
+.ln-flash{position:absolute;inset:0;background:radial-gradient(circle,#fff 0%,#7fe0ff 25%,transparent 60%);opacity:0;pointer-events:none}
+#launch.burst .ln-flash{animation:flash .8s}
+@keyframes flash{0%{opacity:0;transform:scale(.3)}30%{opacity:.9}100%{opacity:0;transform:scale(2.4)}}
+
+/* v2: animations / eye / builtin */
+@keyframes pgIn{from{opacity:0;transform:translateX(var(--dx,28px))}}
+@keyframes monIn{from{opacity:0;transform:scale(.94) translateY(10px)}}
+@keyframes popIn{from{transform:translateX(-10px);opacity:.2}}
+@keyframes paneIn{from{opacity:0;transform:translateY(8px)}}
+@keyframes convIn{from{opacity:0;transform:translateX(18px)}}
+.page.on{animation:pgIn .34s cubic-bezier(.2,.8,.2,1)}
+.stage.swap .monitor{animation:monIn .38s cubic-bezier(.2,.8,.2,1)}
+.stage.swap .stand{animation:paneIn .35s}
+.gitem.pop{animation:popIn .3s cubic-bezier(.2,.8,.2,1)}
+.sbpane.on{animation:paneIn .26s ease-out}
+.chat-conv{animation:convIn .25s ease-out}
+#nav button,.sbtabs button{transition:background .2s,color .2s,border-color .2s}
+@media(prefers-reduced-motion:reduce){.page.on,.stage.swap .monitor,.stage.swap .stand,.gitem.pop,.sbpane.on,.chat-conv{animation:none}}
+#eye{position:absolute;inset:0;background:#ff8a1f;mix-blend-mode:multiply;opacity:0;pointer-events:none;z-index:5}
+#gameFrame{transform-origin:0 0}
+
+/* v3: battery / share / inbox */
+input[type=checkbox]{accent-color:var(--acc);width:18px;height:18px;flex:none;margin:0}
+.sbbat{font-size:12px;color:#cfe0ff;background:rgba(255,255,255,.07);border:1px solid var(--line);border-radius:999px;padding:3px 9px;white-space:nowrap;flex:none}
+.sbbat.low{color:#ffb3bd;border-color:#9b3345;background:#4a152044}
+.shl{display:flex;flex-direction:column;gap:2px;max-height:200px;overflow:auto;border:1px solid var(--line);border-radius:10px;padding:4px;background:#0a1426}
+.shrow{display:flex;align-items:center;gap:10px;padding:6px 8px;border-radius:8px;cursor:pointer}
+.shrow:active{background:rgba(255,255,255,.05)}
+.shrow .aic,.shrow .aic-f{width:34px;height:34px;border-radius:9px;flex:none;padding:3px}
+.shrow .av{width:34px;height:34px;flex:none}
+.shrow .fm small{font-size:11px}
+.tag{display:inline-block;font-size:10px;font-weight:400;color:#8fd3ff;border:1px solid #2a4170;border-radius:6px;padding:0 5px;margin-left:6px;vertical-align:middle}
+.ibx{border:1px solid rgba(10,157,255,.5);background:linear-gradient(135deg,rgba(10,157,255,.14),rgba(15,24,41,.8));border-radius:14px;padding:12px;margin-bottom:12px}
+.ibx-t{font-weight:700;font-size:14px;margin-bottom:2px}
+</style>
+</head>
+<body>
+
+<div id="home">
+  <div class="bgfx"><i class="dia d1"></i><i class="dia d2"></i></div>
+  <header class="top">
+    <div class="chips-s">
+      <span id="chipBat">🔋 --</span>
+      <span id="chipClock"></span>
+      <span id="chipNet"><i class="dot"></i><b>接続中…</b></span>
+      <span id="chipFr">友達 0/0</span>
+    </div>
+    <nav id="nav">
+      <button data-page="home" class="on"><span data-ico="gamepad"></span>ゲームハブ</button>
+      <button data-page="apps"><span data-ico="grid"></span>アプリ一覧</button>
+      <button data-page="friends"><span data-ico="users"></span>フレンド<em class="bdg" id="bFr" hidden></em></button>
+      <button data-page="chat"><span data-ico="chat"></span>チャット<em class="bdg" id="bChat" hidden></em></button>
+      <button data-page="account"><span data-ico="user"></span>アカウント</button>
+    </nav>
+    <div class="topbtns">
+      <button class="ib" id="btnAdd" title="アプリを追加"><span data-ico="plus"></span></button>
+      <button class="ib" id="btnFs" title="全画面化"><span data-ico="fs"></span></button>
+    </div>
+  </header>
+
+  <main id="pages">
+    <section id="p-home" class="page on"></section>
+
+    <section id="p-apps" class="page">
+      <div class="ahead">
+        <button class="ib" data-go="home" title="戻る"><span data-ico="back"></span></button>
+        <h2>アプリ一覧</h2>
+        <input id="aq" class="sbox" placeholder="アプリを検索" autocomplete="off">
+        <button class="primary" id="btnAdd2"><span data-ico="plus"></span> アプリを追加</button>
+      </div>
+      <div class="acols">
+        <div><div class="col-h">ホームに表示中 <b id="cntV">0</b> 個</div><div id="appsV"></div></div>
+        <div><div class="col-h">非表示 <b id="cntH">0</b> 個</div><div id="appsH"></div></div>
+      </div>
+      <div class="recbox" id="recBox"></div>
+    </section>
+
+    <section id="p-friends" class="page">
+      <div class="cols2">
+        <div>
+          <div class="card">
+            <h3>フレンドを追加</h3>
+            <form id="fAdd" class="row2" style="flex-wrap:wrap">
+              <input id="fId" placeholder="相手のPeerID" autocomplete="off" style="flex:2 1 200px">
+              <input id="fNick" placeholder="表示名(任意)" maxlength="20" style="flex:1 1 120px">
+              <button class="primary">追加</button>
+            </form>
+            <div class="muted small" style="margin-top:8px">相手と自分が同時にこのアプリを開いているときだけ、オンライン表示・チャット・通話ができます。</div>
+          </div>
+          <div class="card" id="inboxCard" hidden><h3>🎁 受信ボックス</h3><div id="inboxList"></div></div>
+          <div class="card" id="reqCard" hidden><h3>フレンドリクエスト</h3><div id="reqList"></div></div>
+          <div id="callHome"></div>
+        </div>
+        <div class="card"><h3>フレンド <span id="fCount" class="muted small"></span></h3><div id="friendList"></div></div>
+      </div>
+    </section>
+
+    <section id="p-chat" class="page"><div id="chatHome"></div></section>
+
+    <section id="p-account" class="page">
+      <div class="cols2">
+        <div class="card">
+          <h3>プロフィール</h3>
+          <div class="acc-top">
+            <button class="avbig" id="avBtn" title="アイコンを変更"></button>
+            <input type="file" id="avFile" accept="image/*" hidden>
+            <div style="flex:1"><label class="lb" style="margin-top:0">名前</label><input id="accName" maxlength="20"></div>
+          </div>
+          <div class="muted small" style="margin-top:6px">アイコンをタップして画像を選択</div>
+          <label class="lb">あなたのPeerID（固定）</label>
+          <div class="idbox"><code id="accId"></code><button class="ghost sm" id="copyId">コピー</button></div>
+          <div class="muted small" id="idParts" style="margin-top:6px"></div>
+          <div class="small" id="netInfo" style="margin-top:6px"></div>
+          <label class="lb">好きなゲーム</label>
+          <div id="favChips" class="chips"></div>
+          <div class="row2" style="margin-top:8px"><input id="favIn" placeholder="ゲーム名を入力 (Enterで追加)" maxlength="30"><button class="ghost" id="favAdd">追加</button></div>
+          <div id="favSug" class="chips" style="margin-top:8px"></div>
+        </div>
+        <div><div class="card">
+          <h3>セキュリティ</h3>
+          <div class="setrow"><div><b>ボイス / ビデオチャット</b><small>オフにすると、通話の発信と着信を無効にします</small></div><label class="sw"><input type="checkbox" id="sVoice"><i></i></label></div>
+          <div class="setrow"><div><b>フレンドリクエストを受け付ける</b><small>オフにすると、知らない相手からの申請を無視します</small></div><label class="sw"><input type="checkbox" id="sReq"><i></i></label></div>
+          <div class="setrow"><div><b>プレイ中のゲームを公開</b><small>オフにすると、フレンドに「オンライン」とだけ表示されます</small></div><label class="sw"><input type="checkbox" id="sGame"><i></i></label></div>
+          <div class="setrow"><div><b>フレンドからのアプリ受信</b><small>オフにすると、フレンドから送られたアプリを受け取りません</small></div><label class="sw"><input type="checkbox" id="sRecv"><i></i></label></div>
+          <div class="setrow" id="blkRow" hidden><div><b>拒否したユーザー</b><small id="blkN"></small></div><button class="ghost sm" id="blkClr">解除</button></div>
+        </div>
+        <div class="card"><h3>バックアップ・復元</h3><div class="muted small">PeerID・プロフィール・アプリ一覧・フレンド・チャット履歴・設定を1つのファイルに保存／復元します。</div>
+         <div class="row2" style="margin-top:10px;flex-wrap:wrap"><button class="primary" id="bkSave">バックアップを保存</button><button class="ghost" id="bkLoad">ファイルから復元</button></div>
+         <input type="file" id="bkFile" accept=".json,application/json" hidden>
+         <div class="muted small" style="margin-top:8px">同じPeerIDを複数の端末で同時に開くと接続できません。復元後は元の端末を閉じてください。</div></div></div>
+      </div>
+    </section>
+  </main>
+</div>
+
+<div id="game" hidden class="right">
+  <iframe id="gameFrame" allow="fullscreen *; autoplay *; gamepad *; clipboard-read *; clipboard-write *; microphone *; camera *; accelerometer *; gyroscope *; encrypted-media *; web-share *" allowfullscreen></iframe>
+  <div id="dim"></div><div id="eye"></div>
+  <div id="fpsHud" hidden></div>
+  <div id="timerHud" hidden></div>
+  <button id="sbHandle" title="G-FRAME Menu"><span data-ico="back"></span><em class="bdg" id="bHandle" hidden></em></button>
+  <div id="sbScrim"></div>
+  <aside id="sb">
+    <div class="sbhead"><span class="logo">G-FRAME Menu</span><span class="sbbat" id="sbBat" title="バッテリー残量" hidden></span><span id="sbGame"></span><button class="ib" id="sbClose"><span data-ico="close"></span></button></div>
+    <div class="sbtabs">
+      <button data-t="call"><span data-ico="video"></span>通話</button>
+      <button data-t="status"><span data-ico="users"></span>状況<em class="bdg" id="bSbSt" hidden></em></button>
+      <button data-t="chat"><span data-ico="chat"></span>チャット<em class="bdg" id="bSbChat" hidden></em></button>
+      <button data-t="search"><span data-ico="search"></span>攻略検索</button>
+      <button data-t="menu"><span data-ico="gear"></span>メニュー</button>
+    </div>
+
+    <div class="sbpane" id="sb-call"><div id="sbCallList"></div><div id="callSb"></div></div>
+    <div class="sbpane" id="sb-status"><div id="sbInbox"></div><div id="sbStatus"></div></div>
+    <div class="sbpane" id="sb-chat"><div id="chatSb" style="flex:1;min-height:0;display:flex;flex-direction:column"></div></div>
+
+    <div class="sbpane" id="sb-search">
+      <form id="qForm" class="gsearch"><span data-ico="search"></span><input id="qIn" placeholder="攻略を検索…" autocomplete="off"><button type="button" id="qClr" hidden>×</button></form>
+      <div class="chips"><button class="chip" id="qName" type="button">＋ゲーム名</button><button class="chip" id="qGuide" type="button">＋攻略</button></div>
+      <div id="qBtns" hidden>
+        <button class="qb" data-e="google"><span class="eng">G</span><span class="t" id="qG"></span></button>
+        <button class="qb" data-e="bing"><span class="eng b">B</span><span class="t" id="qB"></span></button>
+      </div>
+      <div id="qRes" hidden>
+        <div class="qres-h"><b id="qResT"></b><a id="qOpen" target="_blank" rel="noopener" class="ib"></a><button class="ib" id="qResX"><span data-ico="close"></span></button></div>
+        <iframe id="qFrame" referrerpolicy="no-referrer"></iframe>
+        <div class="muted small" style="margin-top:6px">表示されない場合は右上の「別タブ」ボタンで開いてください。</div>
+      </div>
+    </div>
+
+    <div class="sbpane" id="sb-menu">
+      <div class="tiles">
+        <button class="tile" id="tDnd"><span data-ico="bell"></span>通知を控える</button>
+        <button class="tile" id="tLock"><span data-ico="lock"></span>画面ロック</button>
+        <button class="tile" id="tFps"><span data-ico="pulse"></span>FPS表示</button>
+        <button class="tile" id="tReload"><span data-ico="refresh"></span>再読み込み</button>
+        <button class="tile" id="tFs"><span data-ico="fs"></span>全画面切替</button>
+        <button class="tile" id="tOpen"><span data-ico="ext"></span>別タブで開く</button>
+        <button class="tile" id="tShare"><span data-ico="gift"></span>アプリを送る</button>
+      </div>
+      <div class="card mini"><div class="lb" style="margin:0 0 6px"><span data-ico="bulb"></span> 暗さ（明るさ） <b id="brVal">100%</b></div><input type="range" id="brR" min="10" max="100" value="100"></div>
+      <div class="card mini"><div class="lb" style="margin:0 0 6px"><span data-ico="bulb"></span> 目の保養（暖色フィルター） <b id="eyeVal">0%</b></div><input type="range" id="eyeR" min="0" max="100" value="0"></div>
+      <div class="card mini"><div class="lb" style="margin:0 0 6px"><span data-ico="fs"></span> iFrame DPI <b id="dpiVal">100%</b></div><input type="range" id="dpiR" min="25" max="400" step="5" value="100">
+       <div class="muted small" style="margin-top:6px">小さい値＝PCサイズで表示（モバイル向け）／大きい値＝拡大して表示（PCでモバイル表示）</div><button class="ghost sm" id="dpiReset" style="margin-top:6px">100%に戻す</button></div>
+      <div class="card mini">
+        <div class="lb" style="margin:0"><span data-ico="timer"></span> タイマー</div>
+        <div class="seg"><button data-m="down" class="on">カウントダウン</button><button data-m="up">ストップウォッチ</button></div>
+        <div class="tm" id="tmDisp">10:00</div>
+        <div class="tmset" id="tmSet"><button data-min="5">5分</button><button data-min="10">10分</button><button data-min="30">30分</button><input id="tmMin" type="number" min="1" max="999" value="10"><span class="muted">分</span></div>
+        <div class="row2"><button class="primary" id="tmGo" style="flex:1">開始</button><button class="ghost" id="tmReset">リセット</button></div>
+      </div>
+      <button class="danger" id="tExit">ゲームを終了してホームへ</button>
+    </div>
+  </aside>
+  <div id="lockov" hidden><div id="unlock">長押しで<br>解除</div></div>
+</div>
+
+<div id="launch" hidden></div>
+<div id="toasts"></div>
+<div id="modal" hidden></div>
+
+<!-- ===== iFrameGAME Store のデータ =====
+ ゲームを追加するには、下のJSON配列に {"name":"アプリ名","gameurl":"URL","genre":"ジャンル","description":"説明"} を足すだけ(カンマ区切り) -->
+<script type="application/json" id="storeData">
+[
+ {"name":"Cookie Clicker","gameurl":"https://cookiegame.org/index.html","genre":"放置系","description":"クッキーを連打して、たくさんのクッキーを増やそう。"},
+ {"name":"Boxity.io","gameurl":"https://boxity.io","genre":"アクション","description":"有名なブロック玩具にインスパイアされた3Dゲーム"},
+ {"name":"Bloxd.io","gameurl":"https://bloxd.io","genre":"オープンワールド","description":"すべてが四角になった世界でサバイバルやクリエイティブ"},
+ {"name":"キノコ伝説","gameurl":"https://kinodenweb.acenetgamejp.com/","genre":"RPG","description":"キノコが主役の超爽快放置RPG"},
+ {"name":"slowroads","gameurl":"https://slowroads.io/","genre":"車","description":"ルールは無い??自由に車を走らせよう"},
+ {"name":"Car Chase!","gameurl":"https://idev.games/appvert/game/1539/game55534/","genre":"車ゲーム","description":"追跡をかわしながら走るストリートレース系ゲーム。"},
+ {"name":"Off road","gameurl":"https://idev.games/appvert/game/1358/game61814/","genre":"車ゲーム","description":"車両を運転し、アイテムを集めて他の車を避ける。"},
+ {"name":"Infinite Racing Drift","gameurl":"https://idev.games/appvert/game/350/game92282/","genre":"車ゲーム","description":"変化するコースでドリフトし、制限時間内のゴールを目指す。"},
+ {"name":"GT-BR CULTZONE Games MotorSports","gameurl":"https://idev.games/appvert/game/4309/game88753/","genre":"車ゲーム","description":"ブラジルの車文化を題材に、車を調整してレースするプロトタイプ。"},
+ {"name":"Top speed","gameurl":"https://idev.games/appvert/game/1373/game95738/","genre":"車ゲーム","description":"街中のコースを走り切るレースゲーム。"},
+ {"name":"Cliff Car Rush","gameurl":"https://idev.games/appvert/game/4107/game6969/","genre":"車ゲーム","description":"峡谷の崖道で岩を避け、車の速度とバランスを保って進む。"},
+ {"name":"Drive Loop","gameurl":"https://idev.games/appvert/game/1941/game90552/","genre":"車ゲーム","description":"円形コースで他の車との衝突を避け、できるだけ長く走る。"},
+ {"name":"Crazy Racer 3D","gameurl":"https://idev.games/appvert/game/2947/game44165/","genre":"車ゲーム","description":"3D視点のレースゲーム。"},
+ {"name":"Cars","gameurl":"https://idev.games/appvert/game/1176/game59070/","genre":"車ゲーム","description":"車を操作して走るシンプルなドライビングゲーム。"},
+ {"name":"AOSP7","gameurl":"https://polandballhub-operator.github.io/appsforechoshowsilk/drohome/launcher/webosp.html","genre":"Simulator","description":"AOSP 7 ui on Gframe"},
+ {"name":"Dr.Driving","gameurl":"https://idev.games/appvert/game/1625/game24376/","genre":"車ゲーム","description":"対向車を避けながら走行距離を伸ばす運転ゲーム。"},
+ {"name":"Masked Special Forces","gameurl":"https://www.onlinegames.io/games/2022/unity2/masked-special-forces/index.html","genre":"IOゲーム","description":"チーム戦やバトルロイヤルで戦うオンラインFPS。"},
+ {"name":"Snaker io","gameurl":"https://cloud.onlinegames.io/games/2026/more/snaker-io/game.html","genre":"IOゲーム","description":"ネオンの餌を集めてヘビを育て、他のヘビとの衝突を避ける対戦ゲーム。"},
+ {"name":"Wasteland Shooters","gameurl":"https://www.onlinegames.io/games/2021/unity2/wasteland-shooters/index.html","genre":"IOゲーム","description":"荒廃したマップで部屋を作成・参加し、FFAやチーム戦を行うFPS。"},
+ {"name":"ArmedForces.io","gameurl":"https://www.onlinegames.io/games/2021/unity3/armedforces-io/index.html","genre":"IOゲーム","description":"装備を整え、チームデスマッチや旗取りなどのモードで戦うFPS。"},
+ {"name":"Survival Karts","gameurl":"https://cloud.onlinegames.io/games/2024/unity3/survival-karts/index-og.html","genre":"IOゲーム","description":"氷のアリーナで他プレイヤーより長く生き残るカート対戦。"},
+ {"name":"Crazy Karts","gameurl":"https://www.onlinegames.io/games/2024/unity/crazy-karts/index.html","genre":"IOゲーム","description":"武器を拾って他のカートと競い合うオンライン対戦レース。"},
+ {"name":"Drako IO","gameurl":"https://cloud.onlinegames.io/games/2022/unity/drako-io/game.html","genre":"IOゲーム","description":"ヒーロー3人のチームを編成し、MOBA風オンラインアリーナで戦う。"},
+ {"name":"CobraZ.io Classic","gameurl":"https://www.onlinegames.io/games/2022/unity/cobraz-io-classic/index.html","genre":"IOゲーム","description":"チームデスマッチや旗取りなど4つのモードを備えたオンラインFPS。"},
+ {"name":"War of Ships io","gameurl":"https://www.onlinegames.io/games/2022/unity3/war-of-ships-io/index.html","genre":"IOゲーム","description":"敵船の攻撃をかわしながら撃ち合い、海上アリーナで生き残る。"},
+ {"name":"ToonZ io","gameurl":"https://www.onlinegames.io/games/2021/unity3/toonz-io/index.html","genre":"IOゲーム","description":"銃や近接武器を使い、複数のマップとモードで他プレイヤーと戦う。"},
+ {"name":"Mini Shooters","gameurl":"https://www.onlinegames.io/games/2021/5/mini-shooters/index.html","genre":"IOゲーム","description":"武器を集め、小さなキャラクターでアリーナ対戦するシューティング。"},
+ {"name":"Snake Wars","gameurl":"https://www.onlinegames.io/games/2024/unity/snake-wars/index.html","genre":"IOゲーム","description":"餌を食べてヘビを成長させ、ハイスコアを目指す。"},
+ {"name":"Guerrillas io","gameurl":"https://www.onlinegames.io/games/2023/unity2/guerrillas-io/index.html","genre":"IOゲーム","description":"部屋を選ぶか作成して参加し、チーム戦やFFAで戦うFPS。"},
+ {"name":"Crazy Cattle 3D","gameurl":"https://cloud.onlinegames.io/games/2025/unity3/crazy-cattle-3d/index-og.html","genre":"3Dゲーム","description":"羊を操作して相手を場外へ押し出す物理演算バトルロイヤル。"},
+ {"name":"Trains io","gameurl":"https://www.onlinegames.io/games/2023/construct/235/trains-io/index.html","genre":"3Dゲーム","description":"列車を操縦してアイテムを集め、他の列車との衝突を避ける対戦ゲーム。"},
+ {"name":"War of Ships io","gameurl":"https://www.onlinegames.io/games/2022/unity3/war-of-ships-io/index.html","genre":"3Dゲーム","description":"海上アリーナで船を操り、敵の攻撃をかわしながら砲撃する。"},
+ {"name":"Mob City","gameurl":"https://www.onlinegames.io/games/2021/unity3/mob-city/index.html","genre":"3Dゲーム","description":"街でミッションをこなし、敵と戦いながら武器や乗り物を活用する。"},
+ {"name":"Hook Wars","gameurl":"https://www.onlinegames.io/games/2023/unity3/hook-wars/index.html","genre":"3Dゲーム","description":"フックで敵を引き寄せ、川を挟んだアリーナでスコアを競う。"},
+ {"name":"Cat Simulator","gameurl":"https://www.onlinegames.io/games/2022/unity4/cat-simulator/index.html","genre":"3Dゲーム","description":"猫を操作し、コイン集めや障害物走、クエストを楽しむシミュレーション。"},
+ {"name":"Poly Racing Cars","gameurl":"https://cloud.onlinegames.io/games/2022/unity3/poly-racing-cars/index-og.html","genre":"3Dゲーム","description":"コースを自作できるローポリ3Dレース。AI戦やオンライン対戦にも対応。"},
+ {"name":"Powerslide Kart Simulator","gameurl":"https://www.onlinegames.io/games/2022/unity3/powerslide-kart-simulator/index.html","genre":"3Dゲーム","description":"カートやバイクで走り、ドリフトやジャンプを楽しむドライビングゲーム。"},
+ {"name":"Velocity Rush","gameurl":"https://cloud.onlinegames.io/games/2026/unity/velocity-rush/game.html","genre":"3Dゲーム","description":"高速で転がるボールを操作し、障害物や穴を避けてコースを進む。"},
+ {"name":"Pixelmon Town","gameurl":"https://cloud.onlinegames.io/games/2025/html/pixelmon-town/game.html","genre":"3Dゲーム","description":"ブロックを壊して配置し、平地や自然のマップに自由に建築するサンドボックス。"},
+ {"name":"Dublix","gameurl":"https://cloud.onlinegames.io/games/2025/unity4/dublix/game-og.html","genre":"3Dゲーム","description":"迷路、パルクール、レースなどを楽しみ、コインで家やキャラクターをカスタマイズする。"},
+ {"name":"Birds With Guns","gameurl":"https://html-classic.itch.zone/html/4877657/index.html","genre":"アクションゲーム","description":"武器を切り替えながら敵と戦う見下ろし型ツインスティック・ローグライクシューター。"},
+ {"name":"Monster Battlegrounds","gameurl":"https://html-classic.itch.zone/html/13241631/Monster%20Battlegrounds%20%28v0_4_1%29%20html/index.html","genre":"アクションゲーム","description":"モンスターを選んで対戦する1対1の格闘ゲーム。"},
+ {"name":"Backstreet Warriors","gameurl":"https://html-classic.itch.zone/html/16294095/index.html","genre":"アクションゲーム","description":"攻撃とパリィで切り抜ける短編ピクセルアートのベルトスクロール格闘ゲーム。"},
+ {"name":"Terra - A Terraria Demake","gameurl":"https://html-classic.itch.zone/html/18226823/index.html?v=1783324418","genre":"アクションゲーム","description":"採掘・クラフト・探索に加え、敵やボスとの戦闘が楽しめるPICO-8製ゲーム。"},
+ {"name":"The Lair","gameurl":"https://html-classic.itch.zone/html/564120/index.html","genre":"アクションゲーム","description":"短剣で敵を倒し、防御やダッシュを使って闇の領主を目指すレトロ調アクション。"},
+ {"name":"Thermomorph","gameurl":"https://html-classic.itch.zone/html/4831099-484160/index.html","genre":"アクションゲーム","description":"宇宙船内でモーションセンサーと火炎放射器を使い、未知の生物から生き延びる。"},
+ {"name":"GEO ","gameurl":"https://polandballhub-operator.github.io/geoclub/","genre":"ポータル","description":"ボールと一緒に、さくっと地形づくり"},
+ {"name":"Hole.io","gameurl":"https://www.holeio.com/","genre":"io","description":"たくさんの建物を落としていこう"},
+ {"name":"Call of War","gameurl":"https://www.callofwar.com/","genre":"ストラテジー","description":"歴史上の戦いを舞台にした戦略ゲーム"}
+]
+</script>
+<script src="https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js"></script>
+<script>
+(()=>{
+'use strict';
+/* ================= utils ================= */
+const $=(s,r=document)=>r.querySelector(s), $$=(s,r=document)=>[...r.querySelectorAll(s)];
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const clip=(s,n)=>String(s??'').slice(0,n);
+const AL='abcdefghijklmnopqrstuvwxyz0123456789';
+const rnd=n=>{const a=new Uint32Array(n);crypto.getRandomValues(a);return [...a].map(x=>AL[x%AL.length]).join('')};
+const IC={
+plus:'<path d="M12 5v14M5 12h14"/>',fs:'<path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/>',
+gear:'<circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M19.1 4.9L17 7M7 17l-2.1 2.1"/>',
+play:'<path d="M7 4l13 8-13 8z"/>',chat:'<path d="M4 5h16v11H9l-5 4z"/>',
+users:'<circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c0-4 3-6 6.5-6s6.5 2 6.5 6M16 5a3.5 3.5 0 010 7M18 14c2.5.5 3.5 2.5 3.5 6"/>',
+user:'<circle cx="12" cy="8" r="4"/><path d="M4 21c0-4.5 3.5-7 8-7s8 2.5 8 7"/>',
+search:'<circle cx="11" cy="11" r="6.5"/><path d="M16 16l5 5"/>',timer:'<circle cx="12" cy="13" r="8"/><path d="M12 9v4l3 2M9 2h6"/>',
+video:'<rect x="3" y="6" width="13" height="12" rx="2"/><path d="M16 10l5-3v10l-5-3z"/>',
+bulb:'<path d="M9 18h6M10 21h4M12 3a6 6 0 00-4 10.5c.8.8 1 1.5 1 2.5h6c0-1 .2-1.7 1-2.5A6 6 0 0012 3z"/>',
+lock:'<rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 018 0v3"/>',
+refresh:'<path d="M20 11a8 8 0 10-2.3 5.7M20 4v7h-7"/>',power:'<path d="M12 3v9M6.5 6.5a8 8 0 1011 0"/>',
+close:'<path d="M6 6l12 12M18 6L6 18"/>',back:'<path d="M15 5l-7 7 7 7"/>',send:'<path d="M3 11l18-8-8 18-2-8z"/>',
+mic:'<rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0014 0M12 18v3"/>',
+gamepad:'<rect x="2" y="7" width="20" height="11" rx="5"/><path d="M7 10v5M4.5 12.5h5M16 11h.01M18.5 14h.01"/>',
+bell:'<path d="M6 16V11a6 6 0 0112 0v5l2 2H4zM10 21h4"/>',pulse:'<path d="M3 12h4l3-8 4 16 3-8h4"/>',
+ext:'<path d="M14 4h6v6M20 4l-9 9M18 14v6H4V6h6"/>',trash:'<path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13"/>',
+gift:'<rect x="3" y="8" width="18" height="4" rx="1"/><path d="M12 8v13M5 12v9h14v-9M12 8C10 4 6 5 7 8c.5 1.5 5 0 5 0zM12 8c2-4 6-3 5 0-.5 1.5-5 0-5 0z"/>',
+grid:'<rect x="4" y="4" width="7" height="7" rx="1"/><rect x="13" y="4" width="7" height="7" rx="1"/><rect x="4" y="13" width="7" height="7" rx="1"/><rect x="13" y="13" width="7" height="7" rx="1"/>'};
+const ico=n=>`<svg class="i" viewBox="0 0 24 24">${IC[n]||''}</svg>`;
+const hhmm=t=>new Date(t).toLocaleTimeString('ja-JP',{hour:'2-digit',minute:'2-digit'});
+function toast(msg,ms=2600){const t=document.createElement('div');t.className='toast';t.textContent=msg;$('#toasts').appendChild(t);setTimeout(()=>t.classList.add('out'),ms);setTimeout(()=>t.remove(),ms+400)}
+const LS={get(k,d){try{const v=localStorage.getItem('gfp_'+k);return v==null?d:JSON.parse(v)}catch(e){return d}},
+ set(k,v){if(window.__gfpRestoring)return;try{localStorage.setItem('gfp_'+k,JSON.stringify(v))}catch(e){toast('保存できませんでした（容量不足の可能性）')}}};
+
+/* ================= data ================= */
+const REC=[{name:'Combat Reloaded',url:'https://nadgames.com/games/Combat_Reloaded_v4'},{name:'Bloxd.io',url:'https://bloxd.io/'}];
+function normUrl(s){s=(s||'').trim();if(!s)return null;if(!/^https?:\/\//i.test(s))s='https://'+s;try{const u=new URL(s);if(!/^https?:$/.test(u.protocol))return null;if(!u.hostname.includes('.')&&u.hostname!=='localhost')return null;return u.href}catch(e){return null}}
+const host=u=>{if(String(u).startsWith('gframe://'))return 'G-FRAME 内蔵';try{return new URL(u).hostname}catch(e){return u}};
+const favicon=u=>'https://www.google.com/s2/favicons?domain='+encodeURIComponent(host(u))+'&sz=128';
+const mkApp=(name,url)=>({id:rnd(8),name,url,visible:true,opt:{orient:'none',side:'right',sidebar:true}});
+function newProfile(){
+ const d=new Date(),p=n=>String(n).padStart(2,'0'),uid=rnd(6),r4=rnd(4);
+ const peerId=`gfp-${d.getFullYear()}${p(d.getMonth()+1)}${p(d.getDate())}-${p(d.getHours())}${p(d.getMinutes())}-${p(d.getSeconds())}-${uid}-${r4}`;
+ return {createdAt:d.getTime(),uid,peerId,name:'Player'+Math.floor(1000+Math.random()*9000),icon:null,iconS:null,favs:[],voice:true,reqOn:true,shareGame:true};
+}
+let profile=LS.get('profile',null); if(!profile){profile=newProfile();LS.set('profile',profile)}
+let apps=LS.get('apps',null); if(!apps){apps=REC.map(r=>mkApp(r.name,r.url));LS.set('apps',apps)}
+const BUILTINS=[['builtin-browser','browser','G-Browser','gframe://browser'],['builtin-store','store','iFrameGAME Store','gframe://store']];
+BUILTINS.forEach(([id,b,n,u])=>{if(!apps.some(a=>a.id===id)){const a=mkApp(n,u);a.id=id;a.builtin=b;apps.push(a)}});LS.set('apps',apps);
+let friends=LS.get('friends',[]), requests=LS.get('requests',[]), blocked=LS.get('blocked',[]);
+let chats=LS.get('chats',{}), unread=LS.get('unread',{});
+let inbox=LS.get('inbox',[]), outbox=LS.get('outbox',[]), shareSeen=LS.get('shareSeen',[]);
+outbox=outbox.filter(o=>o&&Date.now()-o.ts<14*864e5);
+const saveInbox=()=>LS.set('inbox',inbox), saveOut=()=>LS.set('outbox',outbox);
+let settings=Object.assign({dnd:false,engine:'google'},LS.get('settings',{}));
+const saveApps=()=>LS.set('apps',apps), saveFriends=()=>LS.set('friends',friends), saveReq=()=>LS.set('requests',requests), saveChats=()=>LS.set('chats',chats), saveSet=()=>LS.set('settings',settings);
+const getF=id=>friends.find(f=>f.id===id), fname=f=>f.nick||f.name||f.id;
+let page='home', cur=null, sel=0, aq='', lastSel=-1;
+
+/* ================= icons ================= */
+const BI_ICON={browser:'https://raw.githubusercontent.com/PolandBallHub-Operator/g-frame/refs/heads/main/browser.png',store:'https://raw.githubusercontent.com/PolandBallHub-Operator/g-frame/refs/heads/main/store.png'};
+const iconImg=(a,cls='')=>a.builtin?`<img class="aic ${cls}" src="${BI_ICON[a.builtin]}" alt="" data-n="${a.builtin==='browser'?'🌐':'🛒'}" onerror="gfpIcFail(this)">`:`<img class="aic ${cls}" src="${favicon(a.url)}" alt="" data-n="${esc(a.name)}" onerror="gfpIcFail(this)">`;
+window.gfpIcFail=function(im){const d=document.createElement('div');d.className=im.className+' aic-f';d.textContent=Array.from((im.dataset.n||'?').trim())[0].toUpperCase();im.replaceWith(d)};
+const av=(icon,name,on)=>`<div class="av">${icon?`<img src="${esc(icon)}" alt="">`:`<span>${esc((name||'?').trim().charAt(0).toUpperCase())}</span>`}${on===undefined?'':`<i class="dot ${on?'on':''}"></i>`}</div>`;
+
+/* ================= modal ================= */
+function modal(html,mount,sticky){const m=$('#modal');m.innerHTML=`<div class="mbox">${html}</div>`;m.hidden=false;m.onclick=e=>{if(!sticky&&e.target===m)closeModal();if(e.target.closest('[data-close]'))closeModal()};if(mount)mount($('.mbox',m))}
+function closeModal(){const m=$('#modal');m.hidden=true;m.innerHTML='';m.onclick=null}
+function confirmBox(msg,label,cb){modal(`<h3>${esc(msg)}</h3><div class="mbtns"><button class="ghost" data-close>キャンセル</button><button class="primary" id="cfOk">${esc(label)}</button></div>`,r=>{$('#cfOk',r).onclick=()=>{closeModal();cb()}})}
+
+/* ================= nav ================= */
+function go(p){
+ const O=['home','apps','friends','chat','account'];document.documentElement.style.setProperty('--dx',(O.indexOf(p)>=O.indexOf(page)?28:-28)+'px');page=p;$$('.page').forEach(e=>e.classList.toggle('on',e.id==='p-'+p));
+ $$('#nav button').forEach(b=>b.classList.toggle('on',b.dataset.page===p));
+ if(p==='home')renderHub(); if(p==='apps')renderApps(); if(p==='friends'){mountCall($('#callHome'));renderFriends()}
+ if(p==='chat')chatHome.render(); if(p==='account')renderAccount();
+}
+function refreshAll(){renderHub();renderApps();refreshPresence()}
+
+/* ================= hub ================= */
+const vis=()=>apps.filter(a=>a.visible);
+function renderHub(){
+ const root=$('#p-home'),v=vis();
+ if(!v.length){
+  root.innerHTML=`<div class="empty"><div class="eico">${ico('gamepad')}</div><h2>ゲームがまだありません</h2><p class="muted">アプリ一覧でゲームのURLを追加すると、ここに表示されます。</p><div class="chips">${REC.map((r,i)=>`<button class="chip" data-rec="${i}">＋ ${esc(r.name)}</button>`).join('')}</div><button class="primary" data-go="apps">アプリ一覧へ</button></div>`;return}
+ sel=Math.min(sel,v.length-1);const a=v[sel];
+ const bg=Array.from({length:12},(_,i)=>iconImg(v[i%v.length])).join('');
+ root.innerHTML=`<div class="hub">
+  <div class="glist">${v.map((g,i)=>`<div class="gitem ${i===sel?'sel':''}" data-i="${i}">${iconImg(g,'gi')}<span>${esc(g.name)}</span></div>`).join('')}</div>
+  <div class="stage"><div class="monitor"><div class="mon-bg">${bg}</div><div class="mon-icon">${iconImg(a)}</div></div><div class="stand"><i></i>${esc(host(a.url))}</div></div>
+  <div class="go"><button class="play-btn" id="playBtn">プレイを開始</button><button class="ghost" id="cfgBtn">${ico('gear')} 設定</button></div></div>`;
+ const s=$('.gitem.sel',root);if(s&&s.scrollIntoView)s.scrollIntoView({block:'nearest',inline:'center'});
+ if(lastSel!==sel){const st=$('.stage',root);if(st)st.classList.add('swap');if(s)s.classList.add('pop');lastSel=sel}
+}
+$('#p-home').addEventListener('click',e=>{
+ const v=vis();let t;
+ if(t=e.target.closest('.gitem')){sel=+t.dataset.i;renderHub()}
+ else if(e.target.closest('#playBtn')){if(v[sel])launch(v[sel].id)}
+ else if(e.target.closest('#cfgBtn')){if(v[sel])openAppModal(v[sel].id)}
+ else if(t=e.target.closest('[data-rec]')){addApp(REC[+t.dataset.rec].name,REC[+t.dataset.rec].url)}
+ else if(t=e.target.closest('[data-go]')){go(t.dataset.go)}
+});
+document.addEventListener('keydown',e=>{
+ if(e.target.matches('input,select,textarea'))return;
+ if(cur){if(e.key==='Escape')sbClose();return}
+ if(!$('#modal').hidden){if(e.key==='Escape')closeModal();return}
+ if(page!=='home')return;const n=vis().length;if(!n)return;
+ if(e.key==='ArrowDown'||e.key==='ArrowRight'){sel=(sel+1)%n;renderHub()}
+ else if(e.key==='ArrowUp'||e.key==='ArrowLeft'){sel=(sel-1+n)%n;renderHub()}
+ else if(e.key==='Enter'){launch(vis()[sel].id)}
+});
+
+/* ================= apps ================= */
+function appRow(a){return `<div class="row" data-id="${a.id}">${iconImg(a,'ric')}<div class="rmeta"><b>${esc(a.name)}</b><small>${esc(host(a.url))}</small></div>
+ <button class="ib" data-act="play" title="ゲームを開始">${ico('play')}</button><button class="ib" data-act="cfg" title="設定">${ico('gear')}</button>
+ <label class="sw"><input type="checkbox" data-act="vis" ${a.visible?'checked':''}><i></i></label></div>`}
+function renderApps(){
+ const q=aq.trim().toLowerCase(),m=a=>!q||a.name.toLowerCase().includes(q)||a.url.toLowerCase().includes(q);
+ const V=apps.filter(a=>a.visible&&m(a)),H=apps.filter(a=>!a.visible&&m(a));
+ $('#cntV').textContent=apps.filter(a=>a.visible).length;$('#cntH').textContent=apps.filter(a=>!a.visible).length;
+ $('#appsV').innerHTML=V.map(appRow).join('')||'<div class="muted pad">なし</div>';
+ $('#appsH').innerHTML=H.map(appRow).join('')||'<div class="muted pad">なし</div>';
+ $('#aq').placeholder=`${apps.length}個のアプリから検索`;
+ const rec=REC.map((r,i)=>({r,i})).filter(x=>!apps.some(a=>normUrl(a.url)===normUrl(x.r.url)));
+ $('#recBox').innerHTML=rec.length?`<div class="col-h">おすすめ</div><div class="chips">${rec.map(x=>`<button class="chip" data-rec="${x.i}">＋ ${esc(x.r.name)}</button>`).join('')}</div>`:'';
+}
+$('#aq').addEventListener('input',e=>{aq=e.target.value;renderApps()});
+$('#p-apps').addEventListener('click',e=>{
+ let t;
+ if(t=e.target.closest('[data-go]')){go(t.dataset.go);return}
+ if(t=e.target.closest('[data-rec]')){addApp(REC[+t.dataset.rec].name,REC[+t.dataset.rec].url);return}
+ if(e.target.closest('.sw'))return;
+ if(e.target.closest('#btnAdd2')){openAddModal();return}
+ const row=e.target.closest('.row[data-id]');if(!row)return;
+ const act=e.target.closest('[data-act]');
+ if(act&&act.dataset.act==='play')launch(row.dataset.id);else openAppModal(row.dataset.id);
+});
+$('#p-apps').addEventListener('change',e=>{
+ if(e.target.dataset.act!=='vis')return;const a=apps.find(x=>x.id===e.target.closest('.row').dataset.id);
+ if(a){a.visible=e.target.checked;saveApps();renderApps();renderHub()}
+});
+function addApp(name,url,verb){
+ const u=normUrl(url);if(!u){toast('URLが正しくありません');return null}
+ if(apps.some(a=>normUrl(a.url)===u)){toast('すでに追加されています');return null}
+ if(u.startsWith('http:')&&location.protocol==='https:')toast('http のページは https のこのアプリ内で表示できない場合があります',4200);
+ const a=mkApp(clip(name,40).trim()||host(u),u);apps.push(a);saveApps();renderApps();renderHub();toast('「'+a.name+'」を'+(verb||'追加')+'しました');return a;
+}
+function openAddModal(){
+ modal(`<h3>アプリを追加</h3><label class="lb" style="margin-top:0">iframeで開くURL</label><input id="mUrl" inputmode="url" placeholder="https://example.com/game" autocomplete="off">
+ <div class="pv"><div id="mPrev"><div class="aic-f" style="width:48px;height:48px;border-radius:12px">?</div></div><div class="muted small" id="mHost">URLを貼り付けるとアイコンが自動で取得されます</div></div>
+ <label class="lb">アプリの名前</label><input id="mName" maxlength="40" placeholder="好きな名前を付けられます">
+ <div class="lb">おすすめ</div><div class="chips">${REC.map((r,i)=>`<button class="chip" data-r="${i}">${esc(r.name)}</button>`).join('')}</div>
+ <div class="mbtns"><button class="ghost" data-close>キャンセル</button><button class="primary" id="mOk">追加</button></div>`,r=>{
+  const U=$('#mUrl',r),N=$('#mName',r);let touched=false;
+  N.addEventListener('input',()=>touched=true);
+  const upd=()=>{const u=normUrl(U.value);if(u){$('#mPrev',r).innerHTML=iconImg({url:u,name:N.value||host(u)},'').replace('class="aic ','class="aic" style="width:48px;height:48px;border-radius:12px" data-x="');$('#mHost',r).textContent=host(u);if(!touched)N.value=host(u).replace(/^www\./,'')}};
+  U.addEventListener('input',upd);U.addEventListener('change',upd);
+  $$('[data-r]',r).forEach(b=>b.onclick=()=>{const x=REC[+b.dataset.r];U.value=x.url;touched=true;N.value=x.name;upd()});
+  $('#mOk',r).onclick=()=>{if(addApp(N.value,U.value))closeModal()};
+  setTimeout(()=>U.focus(),50);
+ });
+}
+function openAppModal(id){
+ const a=apps.find(x=>x.id===id);if(!a)return;const o=a.opt||{};
+ modal(`<h3>${esc(a.name)} の設定</h3><label class="lb" style="margin-top:0">名前</label><input id="eName" maxlength="40" value="${esc(a.name)}">
+ <label class="lb">URL</label><input id="eUrl" value="${esc(a.url)}" ${a.builtin?'disabled':''}>
+ <label class="lb">画面の向き（対応ブラウザのみ）</label><select id="eOri"><option value="none">指定なし</option><option value="landscape">横向きに固定</option><option value="portrait">縦向きに固定</option></select>
+ <label class="lb">サイドバーの位置</label><select id="eSide"><option value="right">右</option><option value="left">左</option></select>
+ <label class="lb">iFrame DPI（表示倍率） <b id="eDpiV"></b></label><input type="range" id="eDpi" min="25" max="400" step="5">
+ <div class="setrow"><div><b>サイドバーを使う</b><small>ゲーム中のメニュー・通話・チャット・攻略検索</small></div><label class="sw"><input type="checkbox" id="eSb"><i></i></label></div>
+ <div class="mbtns">${a.builtin?'':'<button class="danger" id="eDel">削除</button><button class="ghost" id="eShare">🎁 フレンドに送る</button>'}<button class="ghost" id="eSave">保存</button><button class="primary" id="ePlay">ゲームを開始</button></div>`,r=>{
+  $('#eOri',r).value=o.orient||'none';$('#eDpi',r).value=o.dpi||100;$('#eDpiV',r).textContent=(o.dpi||100)+'%';$('#eDpi',r).oninput=ev=>$('#eDpiV',r).textContent=ev.target.value+'%';$('#eSide',r).value=o.side||'right';$('#eSb',r).checked=o.sidebar!==false;
+  const save=()=>{const u=a.builtin?a.url:normUrl($('#eUrl',r).value);if(!u){toast('URLが正しくありません');return false}
+   a.name=clip($('#eName',r).value,40).trim()||host(u);a.url=u;a.opt={orient:$('#eOri',r).value,side:$('#eSide',r).value,sidebar:$('#eSb',r).checked,dpi:+$('#eDpi',r).value};saveApps();renderApps();renderHub();return true};
+  $('#eSave',r).onclick=()=>{if(save()){closeModal();toast('保存しました')}};
+  $('#ePlay',r).onclick=()=>{if(save())launch(a.id)};
+  if($('#eShare',r))$('#eShare',r).onclick=()=>openShare({pre:[a.id]});
+  if($('#eDel',r))$('#eDel',r).onclick=()=>{closeModal();confirmBox(`「${a.name}」を削除しますか？`,'削除',()=>{apps=apps.filter(x=>x.id!==a.id);saveApps();refreshAll()})};
+ });
+}
+
+/* ================= launch / game ================= */
+function enterFs(){const el=document.documentElement,f=el.requestFullscreen||el.webkitRequestFullscreen;if(f){try{const r=f.call(el);if(r&&r.catch)r.catch(()=>{})}catch(e){}return true}return false}
+function exitFs(){const f=document.exitFullscreen||document.webkitExitFullscreen;if((document.fullscreenElement||document.webkitFullscreenElement)&&f){try{const r=f.call(document);if(r&&r.catch)r.catch(()=>{})}catch(e){}}}
+const inFs=()=>!!(document.fullscreenElement||document.webkitFullscreenElement);
+function toggleFs(){
+ if(inFs()){exitFs();return}
+ if(!enterFs())toast('このブラウザは全画面APIに非対応です。共有メニューの「ホーム画面に追加」でアプリ表示にできます。ゲーム起動中は画面いっぱいに表示します。',5200);
+}
+['fullscreenchange','webkitfullscreenchange'].forEach(n=>document.addEventListener(n,()=>{$('#btnFs').classList.toggle('on',inFs())}));
+
+function playLaunch(a){
+ const L=$('#launch'),w='G-FRAME';
+ L.innerHTML=`<div class="ln-grid"></div><div class="ln-scan"></div><div class="ln-c"><div class="ln-logo">${[...w].map((c,i)=>`<span style="--i:${i}">${c===' '?'&nbsp;':c}</span>`).join('')}</div><div class="ln-sub">${esc(a.name)}</div><div class="ln-bar"><i></i></div></div><div class="ln-flash"></div>`;
+ L.className='';L.hidden=false;
+ setTimeout(()=>L.classList.add('burst'),1750);
+ setTimeout(()=>{L.hidden=true;L.className='';L.innerHTML=''},2600);
+}
+let wl=null;
+async function getWl(){try{if(navigator.wakeLock)wl=await navigator.wakeLock.request('screen')}catch(e){}}
+function relWl(){try{wl&&wl.release()}catch(e){}wl=null}
+document.addEventListener('visibilitychange',()=>{if(cur&&!document.hidden)getWl()});
+
+function launch(id){
+ const a=apps.find(x=>x.id===id);if(!a)return;if(cur){toast('ゲームを起動中です');return}
+ closeModal();enterFs();const o=a.opt||{};
+ if(o.orient&&o.orient!=='none'){try{screen.orientation.lock(o.orient).catch(()=>{})}catch(e){}}
+ cur={app:a,since:Date.now()};
+ const g=$('#game');g.className=(o.side==='left'?'left':'right')+(o.sidebar===false?' nosb':'');g.hidden=false;
+ document.body.classList.add('ingame');
+ $('#sbGame').textContent=a.name;setFrame(a);
+ $('#dim').style.opacity=0;$('#brR').value=100;$('#brVal').textContent='100%';applyEye(settings.eye||0);applyDpi(o.dpi||100);
+ settings.dnd=settings.dnd;sbTabSet('menu',true);syncTiles();
+ playLaunch(a);getWl();broadcastStatus();
+}
+function endGame(){
+ if(!cur)return;
+ {const f=$('#gameFrame');f.removeAttribute('srcdoc');f.src='about:blank';applyDpi(100)}$('#game').hidden=true;$('#game').classList.remove('sbopen');
+ document.body.classList.remove('ingame');$('#lockov').hidden=true;
+ fpsStop();try{screen.orientation.unlock()}catch(e){}relWl();
+ cur=null;broadcastStatus();go(page);refreshPresence();
+}
+const sbOpen=t=>{if(!cur)return;$('#game').classList.add('sbopen');sbTabSet(t||sbT)};
+function sbClose(){$('#game').classList.remove('sbopen')}
+let sbT='menu';
+function sbTabSet(t,silent){
+ sbT=t;$$('.sbtabs button').forEach(b=>b.classList.toggle('on',b.dataset.t===t));$$('.sbpane').forEach(p=>p.classList.toggle('on',p.id==='sb-'+t));
+ if(silent)return;
+ if(t==='call'){mountCall($('#callSb'));renderCallList()} if(t==='status')renderStatusPane(); if(t==='chat')chatSb.render();
+}
+$('#sbHandle').onclick=()=>sbOpen();$('#sbClose').onclick=sbClose;$('#sbScrim').onclick=sbClose;
+$('.sbtabs').addEventListener('click',e=>{const b=e.target.closest('button');if(b)sbTabSet(b.dataset.t)});
+
+/* menu */
+function syncTiles(){$('#tDnd').classList.toggle('on',!!settings.dnd);$('#tFps').classList.toggle('on',fpsOn)}
+$('#tDnd').onclick=()=>{settings.dnd=!settings.dnd;saveSet();syncTiles();toast(settings.dnd?'通知を控えます（チャット通知を非表示）':'通知をオンにしました')};
+$('#tFps').onclick=()=>{fpsOn?fpsStop():fpsStart();syncTiles()};
+$('#tReload').onclick=()=>{if(!cur)return;const f=$('#gameFrame');f.removeAttribute('srcdoc');f.src='about:blank';setTimeout(()=>setFrame(cur.app),60);sbClose()};
+$('#tFs').onclick=()=>{toggleFs()};
+$('#tShare').onclick=()=>{sbClose();openShare()};
+$('#tOpen').onclick=()=>{if(!cur)return;if(cur.app.builtin)toast('内蔵アプリは別タブで開けません');else window.open(cur.app.url,'_blank','noopener')};
+$('#tExit').onclick=()=>confirmBox('ゲームを終了してホームに戻りますか？','終了する',endGame);
+$('#brR').addEventListener('input',e=>{const v=+e.target.value;$('#dim').style.opacity=((100-v)/100*1.0).toFixed(2);$('#brVal').textContent=v+'%'});
+/* eye comfort / dpi */
+function applyEye(v){v=Math.max(0,Math.min(100,+v||0));$('#eye').style.opacity=(v/100*.7).toFixed(2);$('#eyeR').value=v;$('#eyeVal').textContent=v+'%'}
+$('#eyeR').addEventListener('input',e=>{const v=+e.target.value;applyEye(v);settings.eye=v;saveSet()});
+function applyDpi(z){z=Math.max(25,Math.min(400,+z||100));const f=$('#gameFrame'),k=100/z;
+ if(z===100){f.style.width='';f.style.height='';f.style.transform=''}else{f.style.width=f.style.height=(k*100)+'%';f.style.transform='scale('+(z/100)+')'}
+ $('#dpiR').value=z;$('#dpiVal').textContent=z+'%'}
+$('#dpiR').addEventListener('input',e=>{const z=+e.target.value;applyDpi(z);if(cur){cur.app.opt=cur.app.opt||{};cur.app.opt.dpi=z;saveApps()}});
+$('#dpiReset').onclick=()=>{applyDpi(100);if(cur){cur.app.opt=cur.app.opt||{};cur.app.opt.dpi=100;saveApps()}};
+
+/* builtin apps: G-Browser / iFrameGAME Store */
+const DOC_BROWSER=`<!doctype html><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1">
+<style>html,body{margin:0;height:100%;background:#050912;color:#e8eefc;font-family:system-ui,"Hiragino Sans",sans-serif}body{display:flex;flex-direction:column}
+.bar{display:flex;gap:6px;padding:8px;background:#0f1829;border-bottom:1px solid #1d2c4a;align-items:center}
+button{background:#16233d;border:1px solid #2a4170;color:inherit;border-radius:8px;padding:8px 11px;font-size:15px;cursor:pointer}button:disabled{opacity:.35}
+input{flex:1;min-width:0;background:#0a1426;border:1px solid #2a4170;color:inherit;border-radius:8px;padding:9px 12px;font-size:15px;outline:none}input:focus{border-color:#0a9dff}
+#f{flex:1;border:0;background:#fff;width:100%}#hm{flex:1;padding:22px;overflow:auto;text-align:center}
+h1{letter-spacing:.1em;color:#4cb4ff;font-size:22px}.q{display:inline-block;margin:6px;padding:12px 18px;border-radius:10px;background:#12233f;border:1px solid #2a4170}p{color:#8a97b5;font-size:13px}</style>
+<div class=bar><button id=b disabled>◀</button><button id=n disabled>▶</button><button id=r>↻</button><input id=u placeholder="URLまたは検索ワード" autocomplete=off><button id=g>移動</button><button id=o title="別タブで開く">↗</button><button id=h>🏠</button></div>
+<div id=hm><h1>G-BROWSER</h1><p>URLか検索ワードを入力してください</p><button class=q data-u="https://ja.wikipedia.org/">Wikipedia</button><button class=q data-u="https://www.bing.com/">Bing</button><button class=q data-u="https://www.google.com/webhp?igu=1">Google</button>
+<p>※ サイトによっては埋め込み表示を拒否します。その場合は ↗ で別タブを開いてください。</p></div><iframe id=f hidden referrerpolicy=no-referrer></iframe>
+<script>
+var H=[],I=-1,f=document.getElementById('f'),u=document.getElementById('u'),hm=document.getElementById('hm');
+function $(i){return document.getElementById(i)}
+function conv(q){q=q.trim();if(!q)return '';if(/^https?:[/][/]/i.test(q))return q;if(q.indexOf(' ')<0&&q.indexOf('.')>0)return 'https://'+q;return 'https://www.google.com/search?igu=1&q='+encodeURIComponent(q)}
+function show(){var c=H[I];hm.hidden=!!c;f.hidden=!c;if(c){f.src=c;u.value=c}else{f.src='about:blank';f.hidden=true;hm.hidden=false;u.value=''}$('b').disabled=I<0;$('n').disabled=I>=H.length-1}
+function go(q){var c=conv(q);if(!c)return;H=H.slice(0,I+1);H.push(c);I=H.length-1;show()}
+$('g').onclick=function(){go(u.value)};u.onkeydown=function(e){if(e.key==='Enter')go(u.value)};
+$('b').onclick=function(){if(I>=0){I--;show()}};$('n').onclick=function(){if(I<H.length-1){I++;show()}};
+$('r').onclick=function(){if(H[I]){f.src='about:blank';setTimeout(function(){f.src=H[I]},50)}};
+$('h').onclick=function(){I=-1;show()};$('o').onclick=function(){if(H[I])window.open(H[I],'_blank','noopener')};
+hm.onclick=function(e){var t=e.target.getAttribute&&e.target.getAttribute('data-u');if(t)go(t)};
+<\/script>`;
+const DOC_STORE=`<!doctype html><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1">
+<style>html,body{margin:0;min-height:100%;background:radial-gradient(120% 90% at 50% 40%,#10203d,#08101f 55%,#050912);color:#e8eefc;font-family:system-ui,"Hiragino Sans",sans-serif}
+.w{max-width:760px;margin:0 auto;padding:14px 16px 30px}.logo{font-weight:800;letter-spacing:.08em;color:#4cb4ff;font-size:19px;margin:6px 0 10px}
+input{width:100%;box-sizing:border-box;background:#0a1426;border:1px solid #1f63b5;color:inherit;border-radius:10px;padding:12px;font-size:15px;outline:none}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin:10px 0}.chip{border:1px solid #2a4170;border-radius:999px;padding:5px 12px;font-size:13px;background:rgba(255,255,255,.05);color:inherit;cursor:pointer}.chip.on{background:rgba(10,157,255,.22);border-color:#0a9dff;color:#8fd3ff}
+.card{display:flex;gap:12px;align-items:center;background:rgba(15,24,41,.78);border:1px solid #1d2c4a;border-radius:14px;padding:12px;margin-bottom:10px;cursor:pointer;animation:i .3s}@keyframes i{from{opacity:0;transform:translateY(8px)}}
+.card:active{background:rgba(25,40,70,.85)}
+.card img{width:46px;height:46px;border-radius:12px;background:#ffffff14;padding:5px;box-sizing:border-box;flex:none}.m{flex:1;min-width:0}.m b{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.m small{color:#8a97b5;font-size:12px}.g{display:inline-block;font-size:11px;color:#8fd3ff;border:1px solid #2a4170;border-radius:6px;padding:1px 6px;margin-bottom:3px}
+.add{background:linear-gradient(100deg,#0a4bb0,#0a9dff);color:#fff;border:0;border-radius:8px;padding:9px 14px;font-weight:600;cursor:pointer;flex:none}.add:disabled{background:#1a2740;color:#8a97b5}
+.e{color:#8a97b5;text-align:center;padding:30px}
+.bk{background:none;border:0;color:#6cc4ff;font-size:15px;padding:8px 0;cursor:pointer}
+.hero{display:flex;gap:16px;align-items:center;margin:8px 0 16px}.hero img{width:84px;height:84px;border-radius:20px;background:#ffffff14;padding:10px;box-sizing:border-box;flex:none}
+.hero h2{margin:0 0 4px;font-size:21px;word-break:break-all}.sm{color:#8a97b5;font-size:12px}
+.acts{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px}.sub{background:#16233d;border:1px solid #2a4170;color:inherit;border-radius:8px;padding:9px 14px;cursor:pointer;font-size:14px}
+.sec{background:rgba(15,24,41,.78);border:1px solid #1d2c4a;border-radius:14px;padding:14px;margin-bottom:12px}.sec h3{margin:0 0 8px;font-size:14px;color:#bcd2ff}.sec p{margin:0;line-height:1.6;font-size:14px}
+.kv{display:flex;gap:10px;padding:7px 0;border-bottom:1px solid #1d2c4a;font-size:13px}.kv:last-child{border:0}.kv span:first-child{width:80px;color:#8a97b5;flex:none}.kv span:last-child{flex:1;min-width:0;word-break:break-all}
+.note{color:#8a97b5;font-size:12px;line-height:1.5}</style>
+<div class=w><div class=logo>iFrameGAME STORE</div><div id=lv><input id=q placeholder="ゲームを検索（名前・ジャンル・説明）" autocomplete=off><div class=chips id=c></div><div id=l></div></div><div id=d hidden></div></div>
+<script>
+var items=[],owned=[],q='',g='',sel=null,L=document.getElementById('l'),C=document.getElementById('c'),V=document.getElementById('lv'),D=document.getElementById('d');
+function host(u){try{return new URL(u).hostname.replace(/^www[.]/,'')}catch(e){return u}}
+function nu(u){try{return new URL(u).href}catch(e){return u}}
+function nm(it){return it.name||host(it.gameurl)}
+function has(it){return owned.indexOf(nu(it.gameurl))>=0}
+function el(t,c,x){var e=document.createElement(t);if(c)e.className=c;if(x!=null)e.textContent=x;return e}
+function icon(it){var im=document.createElement('img');im.src='https://www.google.com/s2/favicons?domain='+encodeURIComponent(host(it.gameurl))+'&sz=128';im.onerror=function(){im.style.visibility='hidden'};return im}
+function install(it){if(has(it))return;owned.push(nu(it.gameurl));parent.postMessage({gfpStore:'add',url:it.gameurl,name:nm(it)},'*');render()}
+function toTop(){window.scrollTo(0,0)}
+function render(){if(sel){detail(sel);return}V.hidden=false;D.hidden=true;
+ var gs=[];items.forEach(function(i){if(i.genre&&gs.indexOf(i.genre)<0)gs.push(i.genre)});C.innerHTML='';
+ [''].concat(gs).forEach(function(x){var b=el('button','chip'+(x===g?' on':''),x||'すべて');b.onclick=function(){g=x;render()};C.appendChild(b)});
+ L.innerHTML='';var n=0;
+ items.forEach(function(it){if(!it||!it.gameurl)return;var t=(nm(it)+' '+host(it.gameurl)+' '+it.gameurl+' '+(it.genre||'')+' '+(it.description||'')).toLowerCase();if(q&&t.indexOf(q)<0)return;if(g&&it.genre!==g)return;n++;
+  var c=el('div','card'),m=el('div','m');m.appendChild(el('span','g',it.genre||'その他'));m.appendChild(el('b','',nm(it)));m.appendChild(el('small','',it.description||''));
+  var a=el('button','add',has(it)?'インストール済み':'インストール');a.disabled=has(it);a.onclick=function(e){e.stopPropagation();install(it)};
+  c.onclick=function(){sel=it;render();toTop()};c.appendChild(icon(it));c.appendChild(m);c.appendChild(a);L.appendChild(c)});
+ if(!n){L.innerHTML='<div class=e>見つかりませんでした</div>'}}
+function detail(it){V.hidden=true;D.hidden=false;D.innerHTML='';
+ var bk=el('button','bk','← ストアに戻る');bk.onclick=function(){sel=null;render();toTop()};D.appendChild(bk);
+ var h=el('div','hero'),t=el('div');t.appendChild(el('span','g',it.genre||'その他'));t.appendChild(el('h2','',nm(it)));t.appendChild(el('div','sm',host(it.gameurl)));h.appendChild(icon(it));h.appendChild(t);D.appendChild(h);
+ var ac=el('div','acts'),ib=el('button','add',has(it)?'インストール済み':'インストール');ib.disabled=has(it);ib.onclick=function(){install(it)};
+ var sb=el('button','sub','🎁 フレンドに送る');sb.onclick=function(){parent.postMessage({gfpStore:'share',url:it.gameurl,name:nm(it)},'*')};
+ ac.appendChild(ib);ac.appendChild(sb);D.appendChild(ac);
+ var s1=el('div','sec');s1.appendChild(el('h3','','このアプリについて'));s1.appendChild(el('p','',it.description||'説明はありません'));D.appendChild(s1);
+ var s2=el('div','sec');s2.appendChild(el('h3','','情報'));
+ [['ジャンル',it.genre||'その他'],['提供元',host(it.gameurl)],['URL',it.gameurl],['状態',has(it)?'インストール済み':'未インストール']].forEach(function(r){var k=el('div','kv');k.appendChild(el('span','',r[0]));k.appendChild(el('span','',r[1]));s2.appendChild(k)});
+ D.appendChild(s2);D.appendChild(el('div','note','※ 外部サイトを iframe 内で開きます。サイト側が埋め込みを拒否している場合は表示されないことがあります。'))}
+document.getElementById('q').oninput=function(e){q=e.target.value.trim().toLowerCase();render()};
+window.addEventListener('message',function(e){var d=e.data;if(d&&d.gfpStore==='init'){items=d.items||[];owned=d.owned||[];render()}});
+parent.postMessage({gfpStore:'ready'},'*');
+<\/script>`;
+function setFrame(a){const f=$('#gameFrame');
+ if(a.builtin==='browser'){f.removeAttribute('src');f.srcdoc=DOC_BROWSER}
+ else if(a.builtin==='store'){f.removeAttribute('src');f.srcdoc=DOC_STORE}
+ else{f.removeAttribute('srcdoc');f.src=a.url}}
+function storeItems(){try{const j=JSON.parse($('#storeData').textContent);return Array.isArray(j)?j:[]}catch(e){toast('ストアのJSONに誤りがあります');return []}}
+function sendStore(){const w=$('#gameFrame').contentWindow;if(w)w.postMessage({gfpStore:'init',items:storeItems(),owned:apps.map(a=>normUrl(a.url)).filter(Boolean)},'*')}
+window.addEventListener('message',e=>{
+ if(!cur||cur.app.builtin!=='store'||e.source!==$('#gameFrame').contentWindow)return;const d=e.data;if(!d||typeof d!=='object')return;
+ if(d.gfpStore==='ready')sendStore();
+ else if(d.gfpStore==='add'){addApp(String(d.name||''),String(d.url||''),'インストール');sendStore()}
+ else if(d.gfpStore==='share'){const u=normUrl(String(d.url||''));if(u)openShare({extra:{name:clip(String(d.name||host(u)),40),url:u}})}
+});
+
+/* backup / restore */
+$('#bkSave').onclick=()=>{const data={};for(let i=0;i<localStorage.length;i++){const k=localStorage.key(i);if(k&&k.startsWith('gfp_'))data[k]=localStorage.getItem(k)}
+ const blob=new Blob([JSON.stringify({app:'G-FRAME GamePark',ver:1,exported:new Date().toISOString(),data})],{type:'application/json'});
+ const a=document.createElement('a'),d=new Date(),p=n=>String(n).padStart(2,'0');a.href=URL.createObjectURL(blob);a.download='g-frame-backup-'+d.getFullYear()+p(d.getMonth()+1)+p(d.getDate())+'.json';
+ document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove()},500);toast('バックアップを保存しました')};
+$('#bkLoad').onclick=()=>$('#bkFile').click();
+$('#bkFile').addEventListener('change',e=>{const f=e.target.files[0];e.target.value='';if(!f)return;const fr=new FileReader();
+ fr.onload=()=>{let j;try{j=JSON.parse(fr.result)}catch(_){toast('ファイルを読み込めません');return}
+  const ks=j&&j.data&&typeof j.data==='object'?Object.keys(j.data):[];
+  if(j.app!=='G-FRAME GamePark'||!ks.length||!ks.every(k=>k.startsWith('gfp_')&&typeof j.data[k]==='string')||!j.data.gfp_profile){toast('G-FRAMEのバックアップファイルではありません');return}
+  confirmBox('現在のデータ（PeerID含む）を、このバックアップで置き換えて復元しますか？','復元する',()=>{
+   window.__gfpRestoring=true;
+   [...Array(localStorage.length)].map((_,i)=>localStorage.key(i)).forEach(k=>{if(k&&k.startsWith('gfp_'))localStorage.removeItem(k)});
+   ks.forEach(k=>localStorage.setItem(k,j.data[k]));toast('復元しました。再読み込みします…');setTimeout(()=>location.reload(),700)})};
+ fr.readAsText(f)});
+
+/* lock */
+let lockT=0;
+$('#tLock').onclick=()=>{sbClose();$('#lockov').hidden=false;toast('画面をロックしました。右下を長押しで解除',2200)};
+const ul=$('#unlock');
+const holdStart=e=>{e.preventDefault();ul.classList.add('hold');lockT=setTimeout(()=>{$('#lockov').hidden=true;ul.classList.remove('hold')},700)};
+const holdEnd=()=>{clearTimeout(lockT);ul.classList.remove('hold')};
+ul.addEventListener('pointerdown',holdStart);['pointerup','pointerleave','pointercancel'].forEach(n=>ul.addEventListener(n,holdEnd));
+/* fps */
+let fpsOn=false,fpsRaf=0,fc=0,ft=0,batTxt='';
+function fpsLoop(t){fc++;if(!ft)ft=t;if(t-ft>=1000){$('#fpsHud').textContent=Math.round(fc*1000/(t-ft))+' FPS'+batTxt;fc=0;ft=t}fpsRaf=requestAnimationFrame(fpsLoop)}
+function fpsStart(){fpsOn=true;ft=0;fc=0;$('#fpsHud').hidden=false;$('#fpsHud').textContent='-- FPS';fpsRaf=requestAnimationFrame(fpsLoop)}
+function fpsStop(){fpsOn=false;cancelAnimationFrame(fpsRaf);$('#fpsHud').hidden=true;syncTiles()}
+/* timer */
+const tm={mode:'down',total:600000,acc:0,t0:0,run:false,done:false};
+const tmEl=()=>tm.run?tm.acc+Date.now()-tm.t0:tm.acc;
+const fmt=s=>{const h=Math.floor(s/3600),m=Math.floor(s%3600/60),x=s%60,p=n=>String(n).padStart(2,'0');return (h?h+':'+p(m):p(m))+':'+p(x)};
+function tmShow(){
+ const s=tm.mode==='down'?Math.ceil(Math.max(0,tm.total-tmEl())/1000):Math.floor(tmEl()/1000);
+ $('#tmDisp').textContent=fmt(s);const H=$('#timerHud');
+ const showH=cur&&(tm.run||tm.done);H.hidden=!showH;H.classList.toggle('done',tm.done);H.textContent=tm.done?'⏰ タイマー終了（タップで消す）':fmt(s);
+ $('#tmGo').textContent=tm.run?'一時停止':'開始';
+}
+function beep(){try{const ac=new (window.AudioContext||window.webkitAudioContext)();[0,.35,.7].forEach(t=>{const o=ac.createOscillator(),g=ac.createGain();o.frequency.value=880;g.gain.value=.15;o.connect(g);g.connect(ac.destination);o.start(ac.currentTime+t);o.stop(ac.currentTime+t+.2)})}catch(e){}}
+function tmReset(){tm.run=false;tm.acc=0;tm.done=false;tmShow()}
+setInterval(()=>{if(tm.run&&tm.mode==='down'&&tmEl()>=tm.total){tm.run=false;tm.acc=tm.total;tm.done=true;beep();try{navigator.vibrate&&navigator.vibrate([300,150,300])}catch(e){}toast('⏰ タイマー終了！')}tmShow()},250);
+$('#tmGo').onclick=()=>{if(tm.done)tmReset();if(tm.run){tm.acc=tmEl();tm.run=false}else{if(tm.mode==='down'&&tm.acc>=tm.total)tm.acc=0;tm.t0=Date.now();tm.run=true}tmShow()};
+$('#tmReset').onclick=tmReset;
+$('#timerHud').onclick=()=>{if(tm.done)tmReset()};
+$('.seg').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;tm.mode=b.dataset.m;$$('.seg button').forEach(x=>x.classList.toggle('on',x===b));$('#tmSet').style.display=tm.mode==='down'?'flex':'none';tmReset()});
+const setMin=m=>{m=Math.max(1,Math.min(999,+m||10));tm.total=m*60000;$('#tmMin').value=m;if(!tm.run){tm.done=false;tmShow()}};
+$('#tmSet').addEventListener('click',e=>{const b=e.target.closest('[data-min]');if(b)setMin(b.dataset.min)});
+$('#tmMin').addEventListener('change',e=>setMin(e.target.value));
+
+/* search */
+let qEngine=settings.engine,qName=false,qGuide=false;
+const qBuild=()=>[qName&&cur?cur.app.name:'',$('#qIn').value.trim(),qGuide?'攻略':''].filter(Boolean).join(' ');
+const qUrl=(e,q)=>e==='bing'?'https://bing.com/search?q='+encodeURIComponent(q):'https://www.google.com/search?q='+encodeURIComponent(q)+'&igu=1';
+function qUpd(){const q=qBuild(),has=!!$('#qIn').value.trim();$('#qClr').hidden=!has;$('#qBtns').hidden=!has;$('#qG').textContent='Googleで「'+q+'」を検索';$('#qB').textContent='Bingで「'+q+'」を検索'}
+function qRun(e){const q=qBuild();if(!$('#qIn').value.trim())return;qEngine=e;settings.engine=e;saveSet();const u=qUrl(e,q);
+ $('#qRes').hidden=false;$('#qResT').textContent=(e==='bing'?'Bing: ':'Google: ')+q;$('#qFrame').src=u;$('#qOpen').href=u;$('#qOpen').innerHTML=ico('ext')}
+$('#qIn').addEventListener('input',qUpd);
+$('#qForm').addEventListener('submit',e=>{e.preventDefault();qRun(qEngine)});
+$('#qClr').onclick=()=>{$('#qIn').value='';qUpd();$('#qIn').focus()};
+$('#qName').onclick=e=>{qName=!qName;e.currentTarget.classList.toggle('on',qName);qUpd()};
+$('#qGuide').onclick=e=>{qGuide=!qGuide;e.currentTarget.classList.toggle('on',qGuide);qUpd()};
+$('#qBtns').addEventListener('click',e=>{const b=e.target.closest('[data-e]');if(b)qRun(b.dataset.e)});
+$('#qResX').onclick=()=>{$('#qRes').hidden=true;$('#qFrame').src='about:blank'};
+
+/* ================= presence / peer ================= */
+let peer=null,netState='init';const conns={},pres={},connecting={};
+const hasConn=id=>{const s=conns[id];return !!s&&[...s].some(c=>c.open)};
+const isOnline=id=>{const p=pres[id];return hasConn(id)&&!!p&&Date.now()-p.seen<30000};
+const stText=id=>{if(!isOnline(id))return 'オフライン';const p=pres[id];return p.game?'プレイ中: '+p.game:'オンライン'};
+function sendTo(id,m){const s=conns[id];if(!s)return false;for(const c of s){if(c.open){try{c.send(m);return true}catch(e){}}}return false}
+const statusMsg=()=>({t:'status',game:(cur&&profile.shareGame)?cur.app.name:null,since:cur?cur.since:null});
+const helloMsg=()=>Object.assign({t:'hello',name:profile.name,icon:profile.iconS,favs:profile.favs},statusMsg());
+function broadcastStatus(){const m=statusMsg();friends.forEach(f=>sendTo(f.id,m))}
+function broadcastHello(){const m=helloMsg();friends.forEach(f=>sendTo(f.id,m))}
+function profileChanged(){LS.set('profile',profile);clearTimeout(profileChanged.t);profileChanged.t=setTimeout(broadcastHello,600)}
+
+function initPeer(){
+ if(peer&&!peer.destroyed)return;
+ if(typeof Peer==='undefined'){netState='nopeer';updateChips();return}
+ netState='init';updateChips();
+ try{peer=new Peer(profile.peerId,{debug:0})}catch(e){netState='error';updateChips();setTimeout(initPeer,6000);return}
+ peer.on('open',()=>{netState='online';updateChips();friends.forEach(f=>connectTo(f.id,true))});
+ peer.on('connection',c=>bindConn(c));
+ peer.on('call',onIncomingCall);
+ peer.on('disconnected',()=>{netState='reconnecting';updateChips();setTimeout(()=>{try{if(peer&&peer.disconnected)peer.reconnect()}catch(e){}},2500)});
+ peer.on('close',()=>{netState='error';updateChips();peer=null;setTimeout(initPeer,5000)});
+ peer.on('error',e=>{
+  if(e.type==='unavailable-id'){netState='dup';updateChips();try{peer.destroy()}catch(_){}peer=null;setTimeout(initPeer,5000);return}
+  if(e.type==='peer-unavailable'){const m=/peer\s+([\w-]+)/i.exec(e.message||'');if(m){delete connecting[m[1]];const s=conns[m[1]];if(s)[...s].forEach(c=>{if(!c.open)s.delete(c)})}return}
+  if(['network','server-error','socket-error','socket-closed'].includes(e.type)){netState='error';updateChips();setTimeout(()=>{try{if(peer&&peer.disconnected)peer.reconnect()}catch(_){}},5000)}
+ });
+}
+function connectTo(id,force){
+ if(!peer||!peer.open||hasConn(id))return;
+ if(!force&&connecting[id]&&Date.now()-connecting[id]<15000)return;
+ connecting[id]=Date.now();
+ try{bindConn(peer.connect(id,{reliable:true,serialization:'json'}))}catch(e){}
+}
+function bindConn(c){
+ const id=c.peer;(conns[id]=conns[id]||new Set()).add(c);
+ const onOpen=()=>{delete connecting[id];if(getF(id))try{c.send(helloMsg())}catch(e){}refreshPresence()};
+ if(c.open)onOpen();else c.on('open',onOpen);
+ c.on('data',d=>onData(id,c,d));
+ c.on('close',()=>{conns[id]&&conns[id].delete(c);refreshPresence()});
+ c.on('error',()=>{conns[id]&&conns[id].delete(c)});
+}
+function touch(id,d){
+ const was=isOnline(id),p=pres[id]||(pres[id]={seen:0,game:null,since:null}),og=p.game;p.seen=Date.now();
+ if(d.t==='hello'||d.t==='status'){p.game=d.game?clip(d.game,40):null;p.since=d.since||null}
+ const now=isOnline(id);
+ if(!was&&now){const f=getF(id);if(f&&!settings.dnd)toast(fname(f)+' がオンラインになりました');flushPending(id)}
+ if(was!==now||og!==p.game)refreshPresence();
+}
+function onData(id,c,d){
+ if(!d||typeof d!=='object')return;const f=getF(id);
+ if(d.t==='hello'){
+  if(f){
+   f.name=clip(d.name,40)||f.name;
+   if(typeof d.icon==='string'&&/^data:image\/(jpeg|png|webp|gif);base64,/.test(d.icon)&&d.icon.length<60000)f.icon=d.icon;
+   if(Array.isArray(d.favs))f.favs=d.favs.slice(0,10).map(x=>clip(x,30));
+   saveFriends();touch(id,d);refreshPresence();
+  }else if(!blocked.includes(id)&&profile.reqOn&&/^[\w-]{4,80}$/.test(id)){addRequest(id,d)}
+  return;
+ }
+ if(!f)return;
+ touch(id,d);
+ if(d.t==='sync')try{c.send(helloMsg())}catch(e){}
+ else if(d.t==='chat')receiveChat(f,d);
+ else if(d.t==='share')receiveShare(f,d);
+ else if(d.t==='shareAck'){const i=outbox.findIndex(x=>x.id===d.id&&x.to===id);if(i>=0){outbox.splice(i,1);saveOut();if(!settings.dnd)toast('🎁 '+fname(f)+' にアプリが届きました')}}
+ else if(d.t==='ack'){const m=(chats[id]||[]).find(x=>x.id===d.id);if(m&&m.status!=='delivered'){m.status='delivered';saveChats();refreshChats()}}
+}
+function addRequest(id,d){
+ const icon=typeof d.icon==='string'&&/^data:image\/(jpeg|png|webp|gif);base64,/.test(d.icon)&&d.icon.length<60000?d.icon:null;
+ let r=requests.find(x=>x.id===id);
+ if(r){r.name=clip(d.name,40)||r.name;r.icon=icon||r.icon}else{requests.push({id,name:clip(d.name,40),icon,ts:Date.now()});toast((clip(d.name,20)||'誰か')+' からフレンドリクエストが届きました',4000)}
+ saveReq();refreshPresence();
+}
+function addFriend(id,nick){
+ id=(id||'').trim();
+ if(!/^[A-Za-z0-9][\w-]{3,79}$/.test(id)){toast('PeerIDの形式が正しくありません');return false}
+ if(id===profile.peerId){toast('自分自身は追加できません');return false}
+ if(getF(id)){toast('すでにフレンドです');return false}
+ const rq=requests.find(r=>r.id===id);
+ friends.push({id,name:rq?rq.name:id,icon:rq?rq.icon:null,favs:[],nick:clip(nick,20).trim()||''});
+ requests=requests.filter(r=>r.id!==id);blocked=blocked.filter(b=>b!==id);LS.set('blocked',blocked);saveFriends();saveReq();
+ connectTo(id,true);
+ if(rq){sendTo(id,helloMsg());sendTo(id,{t:'sync'})}
+ refreshPresence();return true;
+}
+/* ================= share apps / inbox ================= */
+function shareList(extra){
+ const L=[],seen=new Set(),add=(key,name,url,tag)=>{const u=normUrl(url);if(!u||seen.has(u))return;seen.add(u);L.push({key,name,url:u,tag})};
+ if(extra)add('x',extra.name,extra.url,'ストア');
+ if(cur&&!cur.app.builtin)add(cur.app.id,cur.app.name,cur.app.url,'プレイ中');
+ apps.filter(a=>!a.builtin).forEach(a=>add(a.id,a.name,a.url,''));
+ return L;
+}
+function pushShare(o){if(isOnline(o.to)&&sendTo(o.to,{t:'share',id:o.id,apps:o.apps,ts:o.ts}))return true;connectTo(o.to,true);return false}
+function sendShare(fid,list){
+ const o={to:fid,id:Date.now().toString(36)+rnd(4),apps:list.map(a=>({name:clip(a.name,40),url:a.url})),ts:Date.now()};
+ outbox.push(o);saveOut();return pushShare(o);
+}
+function openShare(o){
+ o=o||{};
+ if(!friends.length){toast('フレンドがいません。「フレンド」ページで追加してください',3600);return}
+ const A=shareList(o.extra);
+ if(!A.length){toast('送れるアプリがありません');return}
+ const preA=new Set(o.extra?['x']:(o.pre&&o.pre.length?o.pre:(cur&&!cur.app.builtin?[cur.app.id]:[])));
+ const F=[...friends].sort((a,b)=>isOnline(b.id)-isOnline(a.id));
+ modal(`<h3>🎁 フレンドにアプリを送る</h3>
+  <div class="lb" style="margin-top:6px">送るアプリ（プレイ中・マイライブラリ）</div>
+  <div class="shl" id="shA">${A.map(a=>`<label class="shrow">${iconImg({url:a.url,name:a.name},'')}<div class="fm"><b>${esc(a.name)}${a.tag?`<span class="tag">${a.tag}</span>`:''}</b><small>${esc(host(a.url))}</small></div><input type="checkbox" value="${esc(a.key)}" ${preA.has(a.key)?'checked':''}></label>`).join('')}</div>
+  <div class="lb">送り先フレンド</div>
+  <div class="shl" id="shF">${F.map(f=>`<label class="shrow">${av(f.icon,fname(f),isOnline(f.id))}<div class="fm"><b>${esc(fname(f))}</b><small>${esc(stText(f.id))}</small></div><input type="checkbox" value="${esc(f.id)}" ${(o.friend===f.id||friends.length===1)?'checked':''}></label>`).join('')}</div>
+  <div class="muted small" style="margin-top:8px">相手の受信ボックスに届き、インストールするかは相手が選びます。オフラインのフレンドには、オンラインになったときに届きます。</div>
+  <div class="mbtns"><button class="ghost" data-close>キャンセル</button><button class="primary" id="shGo">送る</button></div>`,r=>{
+  $('#shGo',r).onclick=()=>{
+   const keys=$$('#shA input:checked',r).map(x=>x.value),ids=$$('#shF input:checked',r).map(x=>x.value);
+   if(!keys.length){toast('送るアプリを選んでください');return}
+   if(!ids.length){toast('送り先のフレンドを選んでください');return}
+   const list=A.filter(a=>keys.includes(a.key));let live=0;
+   closeModal();ids.forEach(id=>{if(sendShare(id,list))live++});
+   toast('🎁 '+list.length+'件のアプリを'+ids.length+'人に送りました'+(live<ids.length?'（オフラインの相手にはオンライン時に届きます）':''),3800);
+  }});
+}
+function receiveShare(f,d){
+ const mid=clip(d.id||'',40);if(!mid)return;
+ sendTo(f.id,{t:'shareAck',id:mid});
+ if(profile.recvApps===false||shareSeen.includes(mid))return;
+ const list=(Array.isArray(d.apps)?d.apps:[]).slice(0,10).map(a=>({name:clip(a&&a.name,40).trim(),url:normUrl(a&&a.url)})).filter(a=>a.url);
+ list.forEach(a=>{if(!a.name)a.name=host(a.url)});
+ if(!list.length)return;
+ shareSeen.push(mid);if(shareSeen.length>200)shareSeen.splice(0,shareSeen.length-200);LS.set('shareSeen',shareSeen);
+ inbox.push({id:mid,from:f.id,apps:list,ts:Date.now()});saveInbox();
+ if(!settings.dnd)toast('🎁 '+fname(f)+' から'+list.length+'件のアプリが届きました',4200);
+ renderInbox();
+}
+function inboxHTML(){
+ return inbox.map(e=>{const f=getF(e.from);
+  const rows=e.apps.map(a=>{const has=apps.some(x=>normUrl(x.url)===a.url);return `<div class="frow">${iconImg({url:a.url,name:a.name},'ric')}<div class="fm"><b>${esc(a.name)}</b><small>${esc(host(a.url))}${has?' ・ インストール済み':''}</small></div></div>`}).join('');
+  return `<div class="ibx" data-eid="${esc(e.id)}"><div class="ibx-t">🎁${e.apps.length}件のアプリを受信しました。インストールしますか?</div><div class="muted small">送信元: ${esc(f?fname(f):e.from)} ・ ${hhmm(e.ts)}</div>${rows}<div class="mbtns" style="margin-top:8px"><button class="ghost sm" data-ib="del">削除</button><button class="primary sm" data-ib="ok">インストール</button></div></div>`}).join('');
+}
+function renderInbox(){const h=inboxHTML();$('#inboxList').innerHTML=h;$('#sbInbox').innerHTML=h;$('#inboxCard').hidden=!inbox.length;updateBadges()}
+document.addEventListener('click',e=>{
+ const b=e.target.closest('[data-ib]');if(!b)return;
+ const box=b.closest('[data-eid]'),id=box&&box.dataset.eid,en=inbox.find(x=>x.id===id);if(!en)return;
+ if(b.dataset.ib==='del'){inbox=inbox.filter(x=>x.id!==id);saveInbox();renderInbox();toast('削除しました');return}
+ let n=0;en.apps.forEach(a=>{if(!apps.some(x=>normUrl(x.url)===a.url)){apps.push(mkApp(clip(a.name,40)||host(a.url),a.url));n++}});
+ inbox=inbox.filter(x=>x.id!==id);saveApps();saveInbox();renderApps();renderHub();renderInbox();
+ toast(n?'🎁 '+n+'件のアプリをインストールしました':'すべてインストール済みでした');
+});
+/* chat */
+function trimChat(id){const a=chats[id];if(a&&a.length>500)a.splice(0,a.length-500)}
+function sendChat(fid,text){
+ const m={id:Date.now().toString(36)+rnd(4),from:'me',text,ts:Date.now(),status:'pending'};
+ (chats[fid]||(chats[fid]=[])).push(m);trimChat(fid);
+ if(isOnline(fid)&&sendTo(fid,{t:'chat',id:m.id,text,ts:m.ts}))m.status='sent';else connectTo(fid,true);
+ saveChats();refreshChats();
+}
+function flushPending(id){
+ outbox.filter(o=>o.to===id).forEach(pushShare);
+ let ch=false;(chats[id]||[]).forEach(m=>{if(m.from==='me'&&m.status==='pending'&&sendTo(id,{t:'chat',id:m.id,text:m.text,ts:m.ts})){m.status='sent';ch=true}});
+ if(ch){saveChats();refreshChats()}
+}
+function receiveChat(f,d){
+ const text=clip(d.text,2000);if(!text)return;const mid=clip(d.id||rnd(8),40);
+ const arr=chats[f.id]||(chats[f.id]=[]);
+ if(!arr.some(m=>m.id===mid)){
+  arr.push({id:mid,from:'them',text,ts:+d.ts||Date.now(),status:'delivered'});trimChat(f.id);saveChats();
+  if(!chatViews.some(v=>v.visible()&&v.target===f.id)){unread[f.id]=(unread[f.id]||0)+1;LS.set('unread',unread);if(!settings.dnd)toast(fname(f)+': '+text.slice(0,40))}
+ }
+ sendTo(f.id,{t:'ack',id:mid});refreshChats();
+}
+/* chat view */
+const chatViews=[];
+function makeChat(el,wide,visible){
+ el.innerHTML=`<div class="chat ${wide?'wide':''}"><div class="chat-list"></div><div class="chat-conv"><div class="chat-empty">${ico('chat')}<div>フレンドを選んでチャット</div></div>
+  <div class="chat-main"><div class="chat-top"><button class="ib back">${ico('back')}</button><div class="ct-name"><b></b><small></small></div><button class="ib call" title="通話">${ico('video')}</button></div>
+  <div class="msgs"></div><form class="chat-form"><input maxlength="1000" placeholder="メッセージを入力" autocomplete="off"><button class="primary" type="submit">${ico('send')}</button></form></div></div></div>`;
+ const v={el,target:null,visible,
+  open(id){v.target=id;v.render()},
+  render(){
+   const root=$('.chat',el);if(!root)return;
+   if(v.target&&!getF(v.target))v.target=null;
+   if(v.target&&v.visible()&&unread[v.target]){delete unread[v.target];LS.set('unread',unread);updateBadges()}
+   root.classList.toggle('has-target',!!v.target);
+   $('.chat-list',el).innerHTML=friends.length?friends.map(f=>`<div class="frow ${f.id===v.target?'cur':''}" data-id="${esc(f.id)}">${av(f.icon,fname(f),isOnline(f.id))}<div class="fm"><b>${esc(fname(f))}</b><small>${esc(stText(f.id))}</small></div>${unread[f.id]?`<em class="bdg" style="position:static">${unread[f.id]}</em>`:''}</div>`).join(''):'<div class="muted pad">フレンドがいません。「フレンド」ページでPeerIDを追加してください。</div>';
+   const f=getF(v.target);$('.chat-main',el).style.display=f?'flex':'none';$('.chat-empty',el).style.display=f?'none':'flex';
+   if(f){
+    $('.ct-name b',el).textContent=fname(f);$('.ct-name small',el).textContent=stText(f.id);$('.call',el).disabled=!isOnline(f.id);
+    const ms=$('.msgs',el),near=ms.scrollHeight-ms.scrollTop-ms.clientHeight<80,n0=ms.childElementCount;
+    const st={pending:'送信待ち（相手がオンラインになったら送信）',sent:'送信済み',delivered:'配信済み'};
+    ms.innerHTML=(chats[f.id]||[]).map(m=>`<div class="msg ${m.from}">${esc(m.text)}<small>${hhmm(m.ts)}${m.from==='me'?' ・ '+st[m.status]:''}</small></div>`).join('');
+    if(near||!n0)ms.scrollTop=ms.scrollHeight;
+   }
+  }};
+ el.addEventListener('click',e=>{
+  const r=e.target.closest('.frow[data-id]');if(r){v.open(r.dataset.id);return}
+  if(e.target.closest('.back')){v.target=null;v.render();return}
+  if(e.target.closest('.call')&&v.target)startCall(v.target);
+ });
+ $('.chat-form',el).addEventListener('submit',e=>{e.preventDefault();const i=$('input',e.currentTarget),t=i.value.trim();if(!t||!v.target)return;i.value='';sendChat(v.target,t)});
+ chatViews.push(v);return v;
+}
+const chatHome=makeChat($('#chatHome'),true,()=>!cur&&page==='chat');
+const chatSb=makeChat($('#chatSb'),false,()=>!!cur&&$('#game').classList.contains('sbopen')&&sbT==='chat');
+const refreshChats=()=>{chatViews.forEach(v=>v.render());updateBadges();renderFriends()};
+
+/* friends page */
+function renderFriends(){
+ $('#fCount').textContent=friends.filter(f=>isOnline(f.id)).length+'/'+friends.length+' オンライン';
+ $('#reqCard').hidden=!requests.length;
+ $('#reqList').innerHTML=requests.map(r=>`<div class="frow">${av(r.icon,r.name)}<div class="fm"><b>${esc(r.name||'名前なし')}</b><small class="mono">${esc(r.id)}</small></div><button class="primary sm" data-a="acc" data-id="${esc(r.id)}">承認</button><button class="ghost sm" data-a="rej" data-id="${esc(r.id)}">拒否</button></div>`).join('');
+ const L=[...friends].sort((a,b)=>isOnline(b.id)-isOnline(a.id));
+ $('#friendList').innerHTML=L.length?L.map(f=>`<div class="frow">${av(f.icon,fname(f),isOnline(f.id))}<div class="fm"><b>${esc(fname(f))}</b><small>${esc(stText(f.id))}</small>${f.favs&&f.favs.length?`<small>好き: ${esc(f.favs.join(', '))}</small>`:''}<small class="mono dim">${esc(f.id)}</small></div>
+  <div class="fbtns"><button class="ib" data-a="chat" data-id="${esc(f.id)}" title="チャット">${ico('chat')}${unread[f.id]?`<em class="bdg">${unread[f.id]}</em>`:''}</button><button class="ib" data-a="call" data-id="${esc(f.id)}" title="通話" ${isOnline(f.id)?'':'disabled'}>${ico('video')}</button><button class="ib" data-a="gift" data-id="${esc(f.id)}" title="アプリを送る">${ico('gift')}</button><button class="ib" data-a="del" data-id="${esc(f.id)}" title="削除">${ico('trash')}</button></div></div>`).join(''):'<div class="muted pad">まだフレンドがいません。相手のPeerIDを入力して追加しましょう。</div>';
+}
+$('#fAdd').addEventListener('submit',e=>{e.preventDefault();if(addFriend($('#fId').value,$('#fNick').value)){$('#fId').value='';$('#fNick').value='';toast('フレンドを追加しました。相手がオンラインのとき接続されます')}});
+$('#p-friends').addEventListener('click',e=>{
+ const b=e.target.closest('[data-a]');if(!b)return;const id=b.dataset.id,f=getF(id);
+ switch(b.dataset.a){
+  case 'chat':go('chat');chatHome.open(id);break;
+  case 'call':startCall(id);break;
+  case 'gift':openShare({friend:id});break;
+  case 'del':confirmBox(`「${f?fname(f):id}」をフレンドから削除しますか？（チャット履歴も削除）`,'削除',()=>{friends=friends.filter(x=>x.id!==id);delete chats[id];delete unread[id];saveFriends();saveChats();LS.set('unread',unread);refreshPresence()});break;
+  case 'acc':{const r=requests.find(x=>x.id===id);if(r){addFriend(id,'');toast('承認しました')}break}
+  case 'rej':requests=requests.filter(x=>x.id!==id);if(!blocked.includes(id))blocked.push(id);LS.set('blocked',blocked);saveReq();refreshPresence();break;
+ }
+});
+function renderStatusPane(){
+ const me=`<div class="frow">${av(profile.icon,profile.name,true)}<div class="fm"><b>${esc(profile.name)}（あなた）</b><small>${cur?'プレイ中: '+esc(cur.app.name):'ホーム'}</small></div></div>`;
+ const L=[...friends].sort((a,b)=>isOnline(b.id)-isOnline(a.id));
+ $('#sbStatus').innerHTML=me+(L.length?L.map(f=>{const p=pres[f.id];const since=isOnline(f.id)&&p.game&&p.since?` ・ ${Math.max(0,Math.floor((Date.now()-p.since)/60000))}分`:'';
+  return `<div class="frow">${av(f.icon,fname(f),isOnline(f.id))}<div class="fm"><b>${esc(fname(f))}</b><small>${esc(stText(f.id))}${since}</small>${f.favs&&f.favs.length?`<small>好き: ${esc(f.favs.join(', '))}</small>`:''}</div></div>`}).join(''):'<div class="muted pad">フレンドがいません</div>');
+}
+function renderCallList(){
+ const el=$('#sbCallList');
+ el.innerHTML=friends.length?friends.map(f=>`<div class="frow">${av(f.icon,fname(f),isOnline(f.id))}<div class="fm"><b>${esc(fname(f))}</b><small>${esc(stText(f.id))}</small></div><button class="primary sm" data-call="${esc(f.id)}" ${isOnline(f.id)&&!call?'':'disabled'}>通話</button></div>`).join(''):'<div class="muted pad">フレンドがいません</div>';
+}
+$('#sbCallList').addEventListener('click',e=>{const b=e.target.closest('[data-call]');if(b)startCall(b.dataset.call)});
+
+/* ================= call ================= */
+let call=null,callWith=null,localStream=null,incoming=null,micOn=true,camOn=true,callState='';
+const callPanel=document.createElement('div');callPanel.className='callp';callPanel.hidden=true;
+callPanel.innerHTML=`<div class="vwrap"><video class="vr" autoplay playsinline></video><video class="vl" autoplay playsinline muted></video><div class="cstat"></div></div><div class="cbtns"><button class="ib2" data-c="mic">${ico('mic')}<span>マイク</span></button><button class="ib2" data-c="cam">${ico('video')}<span>カメラ</span></button><button class="ib2 red" data-c="end">${ico('power')}<span>終了</span></button></div>`;
+const vR=$('.vr',callPanel),vL=$('.vl',callPanel);
+function mountCall(c){if(c&&callPanel.parentNode!==c){c.appendChild(callPanel);if(call)vR.play().catch(()=>{})}}
+function renderCall(){
+ callPanel.hidden=!call;if(!call)return;const f=getF(callWith);const n=f?fname(f):'相手';
+ $('.cstat',callPanel).textContent=callState==='connected'?n+' と通話中':callState==='calling'?n+' を呼び出し中…':'接続中…';
+ $('[data-c=mic]',callPanel).classList.toggle('off',!micOn);$('[data-c=cam]',callPanel).classList.toggle('off',!camOn);
+}
+async function getMedia(){
+ if(!navigator.mediaDevices||!navigator.mediaDevices.getUserMedia){toast('このブラウザ/環境では通話できません（HTTPSで開いてください）',4000);return null}
+ try{return await navigator.mediaDevices.getUserMedia({video:true,audio:true})}catch(e){}
+ try{const s=await navigator.mediaDevices.getUserMedia({audio:true});toast('カメラなしで通話します');return s}catch(e){toast('マイクを使用できません（権限を確認してください）',4000);return null}
+}
+function setupCall(c,fid,state){
+ call=c;callWith=fid;callState=state;micOn=true;camOn=true;
+ vL.srcObject=localStream;
+ c.on('stream',rs=>{vR.srcObject=rs;vR.play().catch(()=>{});callState='connected';renderCall();renderCallList()});
+ c.on('close',()=>{if(call===c)cleanupCall()});
+ c.on('error',()=>{if(call===c)cleanupCall()});
+ renderCall();renderCallList();
+}
+function cleanupCall(){
+ try{localStream&&localStream.getTracks().forEach(t=>t.stop())}catch(e){}
+ localStream=null;call=null;callWith=null;vR.srcObject=null;vL.srcObject=null;renderCall();renderCallList();
+ if(incoming){incoming=null;if(!$('#modal').hidden)closeModal()}
+}
+async function startCall(fid){
+ if(call){toast('通話中です');return}
+ if(!profile.voice){toast('セキュリティ設定でボイス/ビデオチャットがオフです');return}
+ if(!isOnline(fid)){toast('相手がオフラインです');return}
+ const s=await getMedia();if(!s)return;localStream=s;
+ let c;try{c=peer.call(fid,s,{metadata:{name:profile.name}})}catch(e){toast('発信に失敗しました');cleanupCall();return}
+ if(!c){toast('発信に失敗しました');cleanupCall();return}
+ setupCall(c,fid,'calling');
+ if(cur){sbOpen('call')}else{mountCall($('#callHome'))}
+}
+function onIncomingCall(c){
+ const f=getF(c.peer);
+ if(!f||!profile.voice||call||incoming){try{c.close()}catch(e){}return}
+ incoming={c};try{navigator.vibrate&&navigator.vibrate([200,100,200])}catch(e){}
+ c.on('close',()=>{if(incoming&&incoming.c===c){incoming=null;closeModal();toast('着信が終了しました')}});
+ modal(`<h3>${esc(fname(f))} から着信</h3><div class="muted">ビデオ/ボイスチャットに応答しますか？</div><div class="mbtns"><button class="danger" id="inNo">拒否</button><button class="primary" id="inYes">応答</button></div>`,r=>{
+  $('#inNo',r).onclick=()=>{incoming=null;closeModal();try{c.close()}catch(e){}};
+  $('#inYes',r).onclick=async()=>{closeModal();const s=await getMedia();if(!s){incoming=null;try{c.close()}catch(e){}return}
+   localStream=s;incoming=null;c.answer(s);setupCall(c,c.peer,'connecting');if(cur)sbOpen('call');else{go('friends')}};
+ },true);
+ setTimeout(()=>{if(incoming&&incoming.c===c){incoming=null;closeModal();try{c.close()}catch(e){}}},30000);
+}
+callPanel.addEventListener('click',e=>{
+ const b=e.target.closest('[data-c]');if(!b||!call)return;
+ if(b.dataset.c==='end'){try{call.close()}catch(e){}cleanupCall();return}
+ if(b.dataset.c==='mic'){micOn=!micOn;(localStream?localStream.getAudioTracks():[]).forEach(t=>t.enabled=micOn)}
+ if(b.dataset.c==='cam'){if(!localStream||!localStream.getVideoTracks().length){toast('カメラが使えません');return}camOn=!camOn;localStream.getVideoTracks().forEach(t=>t.enabled=camOn)}
+ renderCall();
+});
+
+/* ================= account ================= */
+function renderAccount(){
+ $('#accName').value=profile.name;
+ $('#avBtn').innerHTML=profile.icon?`<img src="${esc(profile.icon)}" alt="">`:`<span>${esc(profile.name.charAt(0)||'?')}</span>`;
+ $('#accId').textContent=profile.peerId;
+ const p=profile.peerId.split('-');
+ $('#idParts').textContent=`構成: ${p[1]}（作成日）/ ${p[2]}（作成時刻）/ ${p[3]}（秒）/ ${p[4]}（ユーザー固有）/ ${p[5]}（自動生成）`;
+ $('#favChips').innerHTML=profile.favs.length?profile.favs.map((f,i)=>`<span class="chip on">${esc(f)}<button class="x" data-rm="${i}">×</button></span>`).join(''):'<span class="muted small">未設定</span>';
+ const sug=apps.map(a=>a.name).filter(n=>!profile.favs.includes(n));
+ $('#favSug').innerHTML=sug.length&&profile.favs.length<10?sug.map(n=>`<button class="chip" data-sug="${esc(n)}">＋ ${esc(n)}</button>`).join(''):'';
+ $('#sVoice').checked=!!profile.voice;$('#sReq').checked=!!profile.reqOn;$('#sGame').checked=!!profile.shareGame;$('#sRecv').checked=profile.recvApps!==false;
+ $('#blkRow').hidden=!blocked.length;$('#blkN').textContent=blocked.length+'件';
+ updateNetInfo();
+}
+const NET={init:['接続中…','wait'],online:['オンライン','on'],reconnecting:['再接続中…','wait'],dup:['別のタブ/端末で同じIDが使用中','wait'],error:['ネットワークエラー（再試行中）','wait'],nopeer:['PeerJSを読み込めません（ネット接続を確認）','']};
+function updateNetInfo(){const n=NET[netState]||NET.init;if(page==='account')$('#netInfo').textContent='接続状態: '+n[0]}
+function addFav(n){n=clip(n,30).trim();if(!n||profile.favs.includes(n)||profile.favs.length>=10)return;profile.favs.push(n);profileChanged();renderAccount()}
+$('#accName').addEventListener('input',e=>{profile.name=clip(e.target.value,20).trim()||'Player';profileChanged()});
+$('#avBtn').onclick=()=>$('#avFile').click();
+function fileToIcon(file,size){return new Promise((res,rej)=>{const fr=new FileReader();fr.onload=()=>{const im=new Image();im.onload=()=>{const c=document.createElement('canvas');c.width=c.height=size;const x=c.getContext('2d'),s=Math.min(im.width,im.height);x.drawImage(im,(im.width-s)/2,(im.height-s)/2,s,s,0,0,size,size);res(c.toDataURL('image/jpeg',.85))};im.onerror=rej;im.src=fr.result};fr.onerror=rej;fr.readAsDataURL(file)})}
+$('#avFile').addEventListener('change',async e=>{const f=e.target.files[0];e.target.value='';if(!f)return;
+ try{profile.icon=await fileToIcon(f,128);profile.iconS=await fileToIcon(f,56);profileChanged();renderAccount();toast('アイコンを更新しました')}catch(err){toast('画像を読み込めませんでした')}});
+$('#copyId').onclick=async()=>{try{await navigator.clipboard.writeText(profile.peerId)}catch(e){const t=document.createElement('textarea');t.value=profile.peerId;document.body.appendChild(t);t.select();try{document.execCommand('copy')}catch(_){}t.remove()}toast('PeerIDをコピーしました')};
+$('#favAdd').onclick=()=>{addFav($('#favIn').value);$('#favIn').value=''};
+$('#favIn').addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();addFav(e.target.value);e.target.value=''}});
+$('#p-account').addEventListener('click',e=>{let t;
+ if(t=e.target.closest('[data-rm]')){profile.favs.splice(+t.dataset.rm,1);profileChanged();renderAccount()}
+ else if(t=e.target.closest('[data-sug]'))addFav(t.dataset.sug);
+ else if(e.target.closest('#blkClr')){blocked=[];LS.set('blocked',blocked);renderAccount()}
+});
+[['#sVoice','voice'],['#sReq','reqOn'],['#sGame','shareGame'],['#sRecv','recvApps']].forEach(([s,k])=>$(s).addEventListener('change',e=>{profile[k]=e.target.checked;profileChanged();if(k==='voice'&&!profile.voice&&call){try{call.close()}catch(_){}cleanupCall()}if(k==='shareGame')broadcastStatus()}));
+
+/* ================= chips / badges ================= */
+const setBdg=(sel,n)=>{const e=$(sel);if(!e)return;e.hidden=!n;e.textContent=n>99?'99+':n};
+function updateBadges(){const u=Object.values(unread).reduce((a,b)=>a+b,0);setBdg('#bChat',u);setBdg('#bSbChat',u);setBdg('#bFr',requests.length+inbox.length);setBdg('#bSbSt',inbox.length);setBdg('#bHandle',u+requests.length+inbox.length)}
+function updateChips(){
+ const n=NET[netState]||NET.init;$('#chipNet b').textContent=n[0].length>10?'接続エラー':n[0];$('#chipNet .dot').className='dot '+n[1];$('#chipNet').title=n[0];
+ $('#chipFr').textContent='友達 '+friends.filter(f=>isOnline(f.id)).length+'/'+friends.length;updateNetInfo();
+}
+function refreshPresence(){renderInbox();renderFriends();renderStatusPane();renderCallList();chatViews.forEach(v=>v.render());updateChips();updateBadges();renderCall()}
+function tickClock(){$('#chipClock').textContent=new Date().toLocaleTimeString('ja-JP',{hour:'2-digit',minute:'2-digit'})}
+if(navigator.getBattery){navigator.getBattery().then(b=>{const u=()=>{const t=Math.round(b.level*100)+'%',mk=(b.charging?'⚡ ':'🔋 ')+t;$('#chipBat').textContent=mk;batTxt=' ・ '+t;const sb=$('#sbBat');sb.hidden=false;sb.textContent=mk;sb.classList.toggle('low',b.level<=.2&&!b.charging)};u();b.addEventListener('levelchange',u);b.addEventListener('chargingchange',u)}).catch(()=>{$('#chipBat').hidden=true})}else $('#chipBat').hidden=true;
+
+/* ================= init ================= */
+$$('[data-ico]').forEach(e=>e.innerHTML=ico(e.dataset.ico));
+$('#nav').addEventListener('click',e=>{const b=e.target.closest('button');if(b)go(b.dataset.page)});
+$('#btnAdd').onclick=()=>{go('apps');openAddModal()};
+$('#btnAdd2').onclick=openAddModal;
+$('#btnFs').onclick=toggleFs;
+$('#tmSet').style.display='flex';
+$('#game').hidden=true;
+tickClock();setInterval(tickClock,20000);
+let tick=0;
+setInterval(()=>{
+ tick++;friends.forEach(f=>{if(!isOnline(f.id))connectTo(f.id)});
+ if(tick%2===0)broadcastStatus();
+ const snap=friends.map(f=>isOnline(f.id)?1:0).join('');
+ if(snap!==setInterval.snap){setInterval.snap=snap;refreshPresence()}
+ if(cur&&sbT==='status'&&$('#game').classList.contains('sbopen'))renderStatusPane();
+},5000);
+window.addEventListener('pagehide',()=>{try{peer&&peer.destroy()}catch(e){}});
+renderHub();renderApps();refreshPresence();tmShow();syncTiles();
+go('home');
+initPeer();
+})();
+</script>
+</body>
+</html>
